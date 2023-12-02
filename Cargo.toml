@@ -26,3 +26,4 @@ opt-level = 'z'
 
 [dependencies]
 bevy = "0.12.1"
+bevy_round_ui = "0.1.1"

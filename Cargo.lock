@@ -859,6 +859,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "bevy_round_ui"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8abbb04780caa3f9e46f947ce34be77e770e221e83bf169cfc6aa733f2fbb149"
+dependencies = [
+ "bevy",
+]
+
+[[package]]
 name = "bevy_scene"
 version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3153,6 +3162,7 @@ name = "tower-quest"
 version = "0.0.0"
 dependencies = [
  "bevy",
+ "bevy_round_ui",
 ]
 
 [[package]]
