@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::GameState;
+use crate::{postprocessing::PostProcessSettings, GameState};
 
 mod start_button;
 
@@ -17,5 +17,5 @@ impl Plugin for MenuPlugin {
 }
 
 fn setup(mut commands: Commands) {
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn((Camera2dBundle::default(), PostProcessSettings::default()));
 }
