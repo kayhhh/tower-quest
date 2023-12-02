@@ -4,7 +4,10 @@ mod menu;
 
 pub fn start() {
     App::new()
-        .add_plugins((DefaultPlugins, menu::MenuPlugin))
+        .add_plugins((
+            DefaultPlugins.set(ImagePlugin::default_nearest()),
+            menu::MenuPlugin,
+        ))
         .add_state::<GameState>()
         .run();
 }

@@ -1,32 +1,33 @@
 use bevy::prelude::*;
 
-const NORMAL_BG: Color = Color::hsl(140.0, 0.6, 0.45);
-const NORMAL_BORDER: Color = Color::hsl(140.0, 0.6, 0.25);
-const NORMAL_TEXT: Color = Color::rgb(0.0, 0.0, 0.0);
+const TEXT_COLOR: Color = Color::hsl(140.0, 0.2, 0.15);
 
-const HOVERED_BG: Color = Color::hsl(140.0, 0.6, 0.55);
-const HOVERED_BORDER: Color = Color::hsl(140.0, 0.6, 0.35);
-const HOVERED_TEXT: Color = Color::rgb(0.0, 0.0, 0.0);
+#[derive(Component)]
+pub struct StartButton;
 
-const PRESSED_BG: Color = Color::hsl(140.0, 0.6, 0.65);
-const PRESSED_BORDER: Color = Color::hsl(140.0, 0.6, 0.45);
-const PRESSED_TEXT: Color = Color::rgb(0.0, 0.0, 0.0);
+pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
+    commands.spawn(SpriteBundle {
+        texture: asset_server.load("sprites/StartButton.png"),
+        transform: Transform::from_scale(Vec3::new(4.0, 4.0, 1.0)),
+        ..default()
+    });
 
-pub fn setup(mut commands: Commands) {
-    commands.spawn(Camera2dBundle::default());
+    let font = asset_server.load("font/vt323.ttf");
 
-    // Start button
     commands
-        .spawn(NodeBundle {
-            style: Style {
-                width: Val::Percent(100.0),
-                height: Val::Percent(100.0),
-                align_items: AlignItems::Center,
-                justify_content: JustifyContent::Center,
+        .spawn((
+            StartButton,
+            NodeBundle {
+                style: Style {
+                    width: Val::Percent(100.0),
+                    height: Val::Percent(100.0),
+                    align_items: AlignItems::Center,
+                    justify_content: JustifyContent::Center,
+                    ..default()
+                },
                 ..default()
             },
-            ..default()
-        })
+        ))
         .with_children(|parent| {
             parent
                 .spawn(ButtonBundle {
@@ -37,17 +38,16 @@ pub fn setup(mut commands: Commands) {
                         padding: UiRect::all(Val::Px(24.0)),
                         ..default()
                     },
-                    border_color: BorderColor(NORMAL_BORDER),
-                    background_color: NORMAL_BG.into(),
+                    background_color: Color::rgba(0.0, 0.0, 0.0, 0.0).into(),
                     ..default()
                 })
                 .with_children(|parent| {
                     parent.spawn(TextBundle::from_section(
-                        "Start Game",
+                        "Start",
                         TextStyle {
-                            font_size: 40.0,
-                            color: NORMAL_TEXT,
-                            ..default()
+                            font,
+                            font_size: 52.0,
+                            color: TEXT_COLOR,
                         },
                     ));
                 });
@@ -55,36 +55,17 @@ pub fn setup(mut commands: Commands) {
 }
 
 pub fn update(
-    mut interaction_query: Query<
-        (
-            &Interaction,
-            &mut BackgroundColor,
-            &mut BorderColor,
-            &Children,
-        ),
-        (Changed<Interaction>, With<Button>),
-    >,
-    mut text_query: Query<&mut Text>,
+    mut interaction_query: Query<&Interaction, (Changed<Interaction>, With<StartButton>)>,
 ) {
-    for (interaction, mut color, mut border_color, children) in &mut interaction_query {
-        let mut text = text_query.get_mut(children[0]).unwrap();
-
+    for interaction in &mut interaction_query {
         match *interaction {
             Interaction::Pressed => {
-                *color = PRESSED_BG.into();
-                border_color.0 = PRESSED_BORDER;
-                text.sections[0].style.color = PRESSED_TEXT;
+                info!("Start button pressed");
             }
             Interaction::Hovered => {
-                *color = HOVERED_BG.into();
-                border_color.0 = HOVERED_BORDER;
-                text.sections[0].style.color = HOVERED_TEXT;
+                info!("Start button hovered");
             }
-            Interaction::None => {
-                *color = NORMAL_BG.into();
-                border_color.0 = NORMAL_BORDER;
-                text.sections[0].style.color = NORMAL_TEXT;
-            }
+            Interaction::None => {}
         }
     }
 }
