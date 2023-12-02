@@ -1,5 +1,5 @@
 use bevy::{
-    core_pipeline::{core_3d, fullscreen_vertex_shader::fullscreen_shader_vertex_state},
+    core_pipeline::{core_2d, fullscreen_vertex_shader::fullscreen_shader_vertex_state},
     ecs::query::QueryItem,
     prelude::*,
     render::{
@@ -39,15 +39,15 @@ impl Plugin for PostProcessPlugin {
 
         render_app
             .add_render_graph_node::<ViewNodeRunner<PostProcessNode>>(
-                core_3d::graph::NAME,
+                core_2d::graph::NAME,
                 PostProcessNode::NAME,
             )
             .add_render_graph_edges(
-                core_3d::graph::NAME,
+                core_2d::graph::NAME,
                 &[
-                    core_3d::graph::node::TONEMAPPING,
+                    core_2d::graph::node::TONEMAPPING,
                     PostProcessNode::NAME,
-                    core_3d::graph::node::END_MAIN_PASS_POST_PROCESSING,
+                    core_2d::graph::node::END_MAIN_PASS_POST_PROCESSING,
                 ],
             );
     }
@@ -203,7 +203,8 @@ impl FromWorld for PostProcessPipeline {
 
 #[derive(Component, Clone, Copy, ExtractComponent, ShaderType)]
 pub struct PostProcessSettings {
-    intensity: f32,
+    resolution: Vec2,
+    granularity: f32,
     // WebGL2 structs must be 16 byte aligned.
     #[cfg(feature = "webgl2")]
     _webgl2_padding: Vec3,
@@ -211,6 +212,9 @@ pub struct PostProcessSettings {
 
 impl Default for PostProcessSettings {
     fn default() -> Self {
-        Self { intensity: 0.02 }
+        Self {
+            resolution: Vec2::new(1440.0, 1440.0),
+            granularity: 100.0,
+        }
     }
 }

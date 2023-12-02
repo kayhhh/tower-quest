@@ -6,11 +6,11 @@ const TEXT_COLOR: Color = Color::hsl(140.0, 0.2, 0.15);
 pub struct StartButton;
 
 pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.spawn(SpriteBundle {
-        texture: asset_server.load("sprites/StartButton.png"),
-        transform: Transform::from_scale(Vec3::new(4.0, 4.0, 1.0)),
-        ..default()
-    });
+    // commands.spawn(SpriteBundle {
+    //     texture: asset_server.load("sprites/StartButton.png"),
+    //     transform: Transform::from_scale(Vec3::new(4.0, 4.0, 1.0)),
+    //     ..default()
+    // });
 
     let font = asset_server.load("font/vt323.ttf");
 
@@ -38,7 +38,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                         padding: UiRect::all(Val::Px(24.0)),
                         ..default()
                     },
-                    background_color: Color::rgba(0.0, 0.0, 0.0, 0.0).into(),
+                    background_color: Color::hsl(140.0, 0.6, 0.4).into(),
                     ..default()
                 })
                 .with_children(|parent| {
@@ -54,7 +54,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         });
 }
 
-pub fn update(
+pub fn interaction(
     mut interaction_query: Query<&Interaction, (Changed<Interaction>, With<StartButton>)>,
 ) {
     for interaction in &mut interaction_query {
