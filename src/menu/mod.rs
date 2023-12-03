@@ -20,8 +20,9 @@ impl Plugin for MenuPlugin {
             .add_systems(
                 Update,
                 (
-                    button::handle_button_actions,
-                    button::handle_button_interactions,
+                    button::defer_actions,
+                    button::handle_actions,
+                    button::handle_interactions,
                 ),
             );
     }

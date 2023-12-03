@@ -55,7 +55,7 @@ impl FromWorld for ButtonStyle {
     }
 }
 
-pub fn handle_button_interactions(
+pub fn handle_interactions(
     mut interaction_query: Query<
         (&Interaction, &mut Handle<RoundUiMaterial>),
         (Changed<Interaction>, With<RoundButton>),
@@ -77,19 +77,61 @@ pub enum ButtonAction {
     Quit,
 }
 
-pub fn handle_button_actions(
+#[derive(Component, Debug)]
+pub struct DeferredAction {
+    pub action: ButtonAction,
+    time: u128,
+}
+
+pub fn defer_actions(
+    mut commands: Commands,
+    time: Res<Time>,
     interaction_query: Query<(&Interaction, &ButtonAction), Changed<Interaction>>,
-    mut app_exit_events: EventWriter<AppExit>,
-    mut next_state: ResMut<NextState<GameState>>,
 ) {
     for (interaction, action) in &interaction_query {
         if *interaction == Interaction::Pressed {
             info!("Button pressed: {:?}", action);
 
+            let time = time.elapsed().as_millis();
+
+            // Delay action so player can see the button press animation
+            // (this sucks but whatever)
             match action {
-                ButtonAction::Start => next_state.set(GameState::Prep),
-                ButtonAction::Quit => app_exit_events.send(AppExit),
-            }
+                ButtonAction::Start => commands.spawn(DeferredAction {
+                    action: ButtonAction::Start,
+                    time,
+                }),
+                ButtonAction::Quit => commands.spawn(DeferredAction {
+                    action: ButtonAction::Quit,
+                    time,
+                }),
+            };
         }
+    }
+}
+
+pub fn handle_actions(
+    actions: Query<(&DeferredAction, Entity)>,
+    time: Res<Time>,
+    mut commands: Commands,
+    mut app_exit_events: EventWriter<AppExit>,
+    mut next_state: ResMut<NextState<GameState>>,
+) {
+    for (deferred, entity) in &mut actions.iter() {
+        let now = time.elapsed().as_millis();
+        let elapsed = now - deferred.time;
+
+        if elapsed < 80 {
+            continue;
+        }
+
+        match deferred.action {
+            ButtonAction::Start => next_state.set(GameState::Prep),
+            ButtonAction::Quit => app_exit_events.send(AppExit),
+        }
+
+        info!("Button action complete: {:?}", deferred);
+
+        commands.entity(entity).despawn();
     }
 }
