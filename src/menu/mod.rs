@@ -1,10 +1,10 @@
-use bevy::{core_pipeline::clear_color::ClearColorConfig, prelude::*};
+use bevy::prelude::*;
 use bevy_round_ui::{
     autosize::{RoundUiAutosizeNode, RoundUiAutosizeNodePadding},
     prelude::{RoundUiBorder, RoundUiMaterial, RoundUiOffset},
 };
 
-use crate::{postprocessing::PostProcessSettings, GameState};
+use crate::GameState;
 
 use self::button::{ButtonAction, ButtonStyle, RoundButton};
 
@@ -16,6 +16,7 @@ impl Plugin for MenuPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<button::ButtonStyle>()
             .add_systems(OnEnter(GameState::Menu), setup)
+            .add_systems(OnExit(GameState::Menu), cleanup)
             .add_systems(
                 Update,
                 (
@@ -26,6 +27,9 @@ impl Plugin for MenuPlugin {
     }
 }
 
+#[derive(Component)]
+struct Menu;
+
 pub fn setup(
     mut commands: Commands,
     button_style: Res<button::ButtonStyle>,
@@ -33,16 +37,6 @@ pub fn setup(
     asset_server: Res<AssetServer>,
 ) {
     let font = asset_server.load("font/vt323.ttf");
-
-    commands.spawn((
-        Camera2dBundle {
-            camera_2d: Camera2d {
-                clear_color: ClearColorConfig::Custom(Color::rgb(1.0, 1.0, 1.0)),
-            },
-            ..default()
-        },
-        PostProcessSettings::default(),
-    ));
 
     let panel_width = 400.0;
     let panel_height = 400.0;
@@ -56,16 +50,19 @@ pub fn setup(
     });
 
     commands
-        .spawn(NodeBundle {
-            style: Style {
-                width: Val::Percent(100.0),
-                height: Val::Percent(100.0),
-                align_items: AlignItems::Center,
-                justify_content: JustifyContent::Center,
+        .spawn((
+            Menu,
+            NodeBundle {
+                style: Style {
+                    width: Val::Percent(100.0),
+                    height: Val::Percent(100.0),
+                    align_items: AlignItems::Center,
+                    justify_content: JustifyContent::Center,
+                    ..default()
+                },
                 ..default()
             },
-            ..default()
-        })
+        ))
         .with_children(|p| {
             p.spawn(MaterialNodeBundle {
                 material: panel_material,
@@ -145,4 +142,10 @@ fn spawn_button(
             ));
         })
         .id()
+}
+
+fn cleanup(mut commands: Commands, menu: Query<Entity, With<Menu>>) {
+    for ent in menu.iter() {
+        commands.entity(ent).despawn_recursive();
+    }
 }
