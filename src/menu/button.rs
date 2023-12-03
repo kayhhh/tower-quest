@@ -77,7 +77,7 @@ pub enum ButtonAction {
     Quit,
 }
 
-#[derive(Component, Debug)]
+#[derive(Component)]
 pub struct DeferredAction {
     pub action: ButtonAction,
     time: u128,
@@ -126,11 +126,11 @@ pub fn handle_actions(
         }
 
         match deferred.action {
-            ButtonAction::Start => next_state.set(GameState::Prep),
+            ButtonAction::Start => next_state.set(GameState::Battle),
             ButtonAction::Quit => app_exit_events.send(AppExit),
         }
 
-        info!("Button action complete: {:?}", deferred);
+        info!("Button action complete: {:?}", deferred.action);
 
         commands.entity(entity).despawn();
     }

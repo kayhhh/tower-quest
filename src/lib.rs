@@ -2,6 +2,7 @@ use bevy::{core_pipeline::clear_color::ClearColorConfig, prelude::*};
 use bevy_round_ui::prelude::RoundUiPlugin;
 use postprocessing::PostProcessSettings;
 
+mod battle;
 mod menu;
 mod postprocessing;
 
@@ -10,6 +11,7 @@ pub fn start() {
         .add_plugins((
             DefaultPlugins.set(ImagePlugin::default_nearest()),
             RoundUiPlugin,
+            battle::BattlePlugin,
             menu::MenuPlugin,
             postprocessing::PostProcessPlugin,
         ))
