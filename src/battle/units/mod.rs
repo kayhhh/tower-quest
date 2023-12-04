@@ -15,7 +15,7 @@ impl Plugin for UnitsPlugin {
             .add_systems(
                 Update,
                 (
-                    (ai::set_target, ai::move_units).chain(),
+                    (ai::set_target, ai::move_units, ai::attack).chain(),
                     spawn::spawn_sprites,
                     spawn::spawn_units::<presets::KnightBundle>,
                     spawn::spawn_units::<presets::ArcherBundle>,
