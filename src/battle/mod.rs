@@ -215,42 +215,38 @@ fn spawn_sprites(
     mut commands: Commands,
     sprites: Res<UnitSprites>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
-    mut units: Query<(Entity, &Unit), Without<TextureAtlasSprite>>,
+    mut units: Query<(Entity, &Unit, &Transform), Without<TextureAtlasSprite>>,
 ) {
-    for (ent, unit) in units.iter_mut() {
+    for (ent, unit, transform) in units.iter_mut() {
         info!("Spawning sprite for {:?}", unit);
 
-        match unit {
-            Unit::Archer => {
-                let atlas = texture_atlases.add(TextureAtlas::from_grid(
-                    sprites.archer.clone(),
-                    Unit::Archer.sprite_size(),
-                    3,
-                    1,
-                    Some(Vec2::splat(1.0)),
-                    Some(Vec2::splat(1.0)),
-                ));
+        let atlas = match unit {
+            Unit::Archer => texture_atlases.add(TextureAtlas::from_grid(
+                sprites.archer.clone(),
+                Unit::Archer.sprite_size(),
+                3,
+                1,
+                Some(Vec2::splat(1.0)),
+                Some(Vec2::splat(1.0)),
+            )),
 
-                commands
-                    .entity(ent)
-                    .insert((TextureAtlasSprite::new(0), atlas));
-            }
-
-            Unit::Knight => {
-                let atlas = texture_atlases.add(TextureAtlas::from_grid(
-                    sprites.knight.clone(),
-                    Unit::Knight.sprite_size(),
-                    3,
-                    1,
-                    Some(Vec2::splat(1.0)),
-                    Some(Vec2::splat(1.0)),
-                ));
-
-                commands
-                    .entity(ent)
-                    .insert((TextureAtlasSprite::new(0), atlas));
-            }
+            Unit::Knight => texture_atlases.add(TextureAtlas::from_grid(
+                sprites.knight.clone(),
+                Unit::Knight.sprite_size(),
+                3,
+                1,
+                Some(Vec2::splat(1.0)),
+                Some(Vec2::splat(1.0)),
+            )),
         };
+
+        let sprite = TextureAtlasSprite {
+            index: 0,
+            flip_x: transform.translation.x > 0.0,
+            ..default()
+        };
+
+        commands.entity(ent).insert((sprite, atlas));
     }
 }
 
