@@ -1,8 +1,8 @@
 use bevy::prelude::*;
 
 use super::{
-    ai::{AttackCooldown, AttackDamage, AttackRange, MovementSpeed},
-    Health, UnitSprite,
+    ai::{AttackCooldown, AttackDamage, AttackRange, Health, MovementSpeed},
+    UnitSprite,
 };
 
 #[derive(Bundle, Clone)]

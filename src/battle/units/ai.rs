@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use super::{Health, Team};
+use super::Team;
 
 #[derive(Component, Clone, Default)]
 pub struct MovementSpeed(pub f32);
@@ -24,6 +24,9 @@ pub struct AttackCooldown(pub f32);
 
 #[derive(Component)]
 pub struct LastAttackTime(pub f32);
+
+#[derive(Component, Clone, Default)]
+pub struct Health(pub f32);
 
 #[derive(Component)]
 pub struct Dead;

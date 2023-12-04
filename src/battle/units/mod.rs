@@ -61,9 +61,6 @@ impl UnitSprite {
     }
 }
 
-#[derive(Component, Clone, Default)]
-pub struct Health(pub f32);
-
 #[derive(Component, Clone, Debug, Default, PartialEq)]
 pub enum Team {
     #[default]
