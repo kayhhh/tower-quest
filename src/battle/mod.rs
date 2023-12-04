@@ -71,9 +71,9 @@ pub enum Team {
 
 #[derive(Default)]
 pub enum Formation {
-    #[default]
     Line,
     Column,
+    #[default]
     Box,
 }
 
@@ -94,8 +94,7 @@ pub struct UnitSpawn {
 #[derive(Bundle, Default)]
 pub struct UnitSpawnBundle {
     pub spawn: UnitSpawn,
-    pub transform: Transform,
-    pub global_transform: GlobalTransform,
+    pub transform: TransformBundle,
 }
 
 fn setup(mut commands: Commands, mut camera_zoom: Query<&mut Zoom, With<Camera>>) {
@@ -104,7 +103,7 @@ fn setup(mut commands: Commands, mut camera_zoom: Query<&mut Zoom, With<Camera>>
 
     commands.spawn(UnitSpawnBundle {
         spawn: UnitSpawn {
-            formation: Formation::Line,
+            formation: Formation::Box,
             unit_count: 10,
             team: Team::Player,
             unit: Unit::Knight,
@@ -135,10 +134,13 @@ fn spawn_units(mut commands: Commands, mut spawns: Query<(&mut UnitSpawn, &Trans
 
             info!("Spawning {:?} at ({}, {})", spawn.unit, x, y);
 
-            let mut ent = commands.spawn(TransformBundle {
-                local: Transform::from_xyz(x, y, 0.0),
-                ..default()
-            });
+            let mut ent = commands.spawn((
+                TransformBundle {
+                    local: Transform::from_xyz(x, y, 0.0),
+                    ..default()
+                },
+                VisibilityBundle::default(),
+            ));
 
             match spawn.unit {
                 Unit::Knight => ent.insert(Unit::Knight),
@@ -215,9 +217,11 @@ fn spawn_sprites(
     mut commands: Commands,
     sprites: Res<UnitSprites>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
-    mut units: Query<(Entity, &Unit), Without<Sprite>>,
+    mut units: Query<(Entity, &Unit), Without<TextureAtlasSprite>>,
 ) {
     for (ent, unit) in units.iter_mut() {
+        info!("Spawning sprite for {:?}", unit);
+
         match unit {
             Unit::Archer => {
                 commands.entity(ent).insert(SpriteSheetBundle {
@@ -227,21 +231,18 @@ fn spawn_sprites(
             }
 
             Unit::Knight => {
-                let atlas = TextureAtlas::from_grid(
+                let atlas = texture_atlases.add(TextureAtlas::from_grid(
                     sprites.knight_texture.clone(),
                     Unit::Knight.sprite_size(),
                     3,
                     1,
                     Some(Vec2::splat(1.0)),
                     Some(Vec2::splat(1.0)),
-                );
+                ));
 
-                let atlas = texture_atlases.add(atlas);
-
-                commands.entity(ent).insert(SpriteSheetBundle {
-                    texture_atlas: atlas,
-                    ..default()
-                });
+                commands
+                    .entity(ent)
+                    .insert((TextureAtlasSprite::new(0), atlas));
             }
         };
     }
