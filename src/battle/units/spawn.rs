@@ -1,13 +1,17 @@
 use bevy::prelude::*;
 
-use crate::battle::units::{Health, UnitBundle};
+use super::{Formation, UnitSprite, UnitSprites};
 
-use super::{Formation, Team, Unit, UnitSprites};
+#[derive(Default)]
+pub enum SpawnableUnit {
+    #[default]
+    Knight,
+    Archer,
+}
 
 #[derive(Component, Default)]
-pub struct UnitSpawn {
-    pub unit: Unit,
-    pub team: Team,
+pub struct UnitSpawn<T: Bundle + Default> {
+    pub unit: T,
     pub formation: Formation,
     /// Number of units to spawn
     pub unit_count: usize,
@@ -16,55 +20,53 @@ pub struct UnitSpawn {
 }
 
 #[derive(Bundle, Default)]
-pub struct UnitSpawnBundle {
-    pub spawn: UnitSpawn,
+pub struct UnitSpawnBundle<T: Bundle + Default> {
+    pub spawn: UnitSpawn<T>,
     pub transform: TransformBundle,
 }
 
-pub fn spawn_units(mut commands: Commands, mut spawns: Query<(&mut UnitSpawn, &Transform)>) {
+pub fn spawn_units<T: Bundle + Clone + Default>(
+    mut commands: Commands,
+    mut spawns: Query<(&mut UnitSpawn<T>, &Transform)>,
+) {
     for (mut spawn, transform) in spawns.iter_mut() {
         if spawn.spawned {
             continue;
         }
 
         let coords = match spawn.formation {
-            Formation::Line => coords_line(&spawn),
-            Formation::Column => coords_column(&spawn),
-            Formation::Box => coords_box(&spawn),
+            Formation::Line => coords_line(spawn.unit_count),
+            Formation::Column => coords_column(spawn.unit_count),
+            Formation::Box => coords_box(spawn.unit_count),
         };
 
         for (mut x, mut y) in coords {
-            x *= spawn.unit.sprite_size().x;
-            y *= spawn.unit.sprite_size().y;
+            x *= 11.0;
+            y *= 8.0;
 
             x += transform.translation.x;
             y += transform.translation.y;
 
-            info!("Spawning {:?} at ({}, {})", spawn.unit, x, y);
+            info!("Spawning unit at ({}, {})", x, y);
 
-            commands.spawn(UnitBundle {
-                unit: spawn.unit.clone(),
-                team: spawn.team.clone(),
-                health: Health(spawn.unit.max_health()),
-                transform: TransformBundle {
-                    local: Transform::from_xyz(x, y, 0.0),
-                    ..default()
-                },
-                ..default()
-            });
+            commands.spawn((
+                spawn.unit.clone(),
+                TransformBundle::from_transform(Transform::from_xyz(x, y, 0.0)),
+                VisibilityBundle::default(),
+            ));
         }
 
         spawn.spawned = true;
     }
 }
 
-fn coords_line(spawn: &UnitSpawn) -> Vec<(f32, f32)> {
+fn coords_line(count: usize) -> Vec<(f32, f32)> {
     let mut coords = Vec::new();
 
     let mut x = 0.0;
     let y = 0.0;
 
-    for _ in 0..spawn.unit_count {
+    for _ in 0..count {
         coords.push((x, y));
 
         x += 1.0;
@@ -73,13 +75,13 @@ fn coords_line(spawn: &UnitSpawn) -> Vec<(f32, f32)> {
     coords
 }
 
-fn coords_column(spawn: &UnitSpawn) -> Vec<(f32, f32)> {
+fn coords_column(count: usize) -> Vec<(f32, f32)> {
     let mut coords = Vec::new();
 
     let x = 0.0;
     let mut y = 0.0;
 
-    for _ in 0..spawn.unit_count {
+    for _ in 0..count {
         coords.push((x, y));
 
         y += 1.0;
@@ -88,7 +90,7 @@ fn coords_column(spawn: &UnitSpawn) -> Vec<(f32, f32)> {
     coords
 }
 
-fn coords_box(spawn: &UnitSpawn) -> Vec<(f32, f32)> {
+fn coords_box(count: usize) -> Vec<(f32, f32)> {
     let mut coords = Vec::new();
 
     let mut x = 0.0;
@@ -96,11 +98,11 @@ fn coords_box(spawn: &UnitSpawn) -> Vec<(f32, f32)> {
 
     // Find closest square, greater than or equal to unit_count
     let mut square = 1;
-    while square * square < spawn.unit_count {
+    while square * square < count {
         square += 1;
     }
 
-    for _ in 0..spawn.unit_count {
+    for _ in 0..count {
         coords.push((x, y));
 
         x += 1.0;
@@ -118,24 +120,22 @@ pub fn spawn_sprites(
     mut commands: Commands,
     sprites: Res<UnitSprites>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
-    mut units: Query<(Entity, &Unit, &Transform), Without<TextureAtlasSprite>>,
+    mut units: Query<(Entity, &UnitSprite, &Transform), Without<TextureAtlasSprite>>,
 ) {
     for (ent, unit, transform) in units.iter_mut() {
-        info!("Spawning sprite for {:?}", unit);
-
         let atlas = match unit {
-            Unit::Archer => texture_atlases.add(TextureAtlas::from_grid(
+            UnitSprite::Archer => texture_atlases.add(TextureAtlas::from_grid(
                 sprites.archer.clone(),
-                Unit::Archer.sprite_size(),
+                UnitSprite::Archer.sprite_size(),
                 3,
                 1,
                 Some(Vec2::splat(1.0)),
                 Some(Vec2::splat(1.0)),
             )),
 
-            Unit::Knight => texture_atlases.add(TextureAtlas::from_grid(
+            UnitSprite::Knight => texture_atlases.add(TextureAtlas::from_grid(
                 sprites.knight.clone(),
-                Unit::Knight.sprite_size(),
+                UnitSprite::Knight.sprite_size(),
                 3,
                 1,
                 Some(Vec2::splat(1.0)),
@@ -153,7 +153,7 @@ pub fn spawn_sprites(
     }
 }
 
-pub fn reset_spawns(mut spawns: Query<&mut UnitSpawn>) {
+pub fn reset_spawns<T: Bundle + Default>(mut spawns: Query<&mut UnitSpawn<T>>) {
     for mut spawn in &mut spawns.iter_mut() {
         spawn.spawned = false;
     }

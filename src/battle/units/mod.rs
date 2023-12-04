@@ -2,6 +2,7 @@ use bevy::prelude::*;
 
 use crate::GameState;
 
+mod ai;
 pub mod spawn;
 
 pub struct UnitsPlugin;
@@ -10,10 +11,13 @@ impl Plugin for UnitsPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<UnitSprites>()
             .add_systems(Startup, load_sprites)
-            .add_systems(Update, (spawn::spawn_units, spawn::spawn_sprites))
+            .add_systems(
+                Update,
+                (spawn::spawn_units::<KnightBundle>, spawn::spawn_sprites),
+            )
             .add_systems(
                 OnExit(GameState::Battle),
-                (despawn_units, spawn::reset_spawns),
+                (despawn_units, spawn::reset_spawns::<KnightBundle>),
             );
     }
 }
@@ -32,32 +36,42 @@ fn load_sprites(mut commands: Commands, asset_server: Res<AssetServer>) {
 }
 
 #[derive(Component, Clone, Debug, Default, PartialEq)]
-pub enum Unit {
+pub enum UnitSprite {
     Archer,
     #[default]
     Knight,
 }
 
-impl Unit {
+impl UnitSprite {
     pub fn sprite_size(&self) -> Vec2 {
         match self {
-            Unit::Knight => Vec2::new(11.0, 8.0),
-            Unit::Archer => Vec2::new(11.0, 8.0),
-        }
-    }
-
-    pub fn max_health(&self) -> f32 {
-        match self {
-            Unit::Knight => 100.0,
-            Unit::Archer => 50.0,
+            UnitSprite::Knight => Vec2::new(11.0, 8.0),
+            UnitSprite::Archer => Vec2::new(11.0, 8.0),
         }
     }
 }
 
-#[derive(Component, Default)]
-pub struct Health(pub f32);
+#[derive(Bundle, Clone)]
+pub struct KnightBundle {
+    pub sprite: UnitSprite,
+    pub team: Team,
+    pub health: Health,
+}
+
+impl Default for KnightBundle {
+    fn default() -> Self {
+        Self {
+            sprite: UnitSprite::Knight,
+            team: Team::default(),
+            health: Health(100.0),
+        }
+    }
+}
 
 #[derive(Component, Clone, Default)]
+pub struct Health(pub f32);
+
+#[derive(Component, Clone, Debug, Default)]
 pub enum Team {
     #[default]
     Player,
@@ -72,16 +86,7 @@ pub enum Formation {
     Box,
 }
 
-#[derive(Bundle, Default)]
-pub struct UnitBundle {
-    pub unit: Unit,
-    pub team: Team,
-    pub health: Health,
-    pub transform: TransformBundle,
-    pub visibility: VisibilityBundle,
-}
-
-fn despawn_units(mut commands: Commands, units: Query<Entity, With<Unit>>) {
+fn despawn_units(mut commands: Commands, units: Query<Entity, With<UnitSprite>>) {
     for ent in &mut units.iter() {
         commands.entity(ent).despawn_recursive();
     }
