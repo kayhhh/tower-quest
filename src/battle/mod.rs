@@ -16,9 +16,8 @@ impl Plugin for BattlePlugin {
 
 #[derive(Default, Resource)]
 pub struct UnitSprites {
-    archer: Handle<TextureAtlas>,
-    knight: Handle<TextureAtlas>,
-    knight_texture: Handle<Image>,
+    archer: Handle<Image>,
+    knight: Handle<Image>,
 }
 
 fn load_sprites(
@@ -26,23 +25,9 @@ fn load_sprites(
     asset_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
 ) {
-    let knight = {
-        let texture_handle = asset_server.load("sprites/Knight.png");
-        let atlas = TextureAtlas::from_grid(
-            texture_handle,
-            Unit::Knight.sprite_size(),
-            3,
-            1,
-            Some(Vec2::splat(1.0)),
-            Some(Vec2::splat(1.0)),
-        );
-        texture_atlases.add(atlas)
-    };
-
     commands.insert_resource(UnitSprites {
-        archer: knight.clone(),
-        knight,
-        knight_texture: asset_server.load("sprites/Knight.png"),
+        archer: asset_server.load("sprites/Knight.png"),
+        knight: asset_server.load("sprites/Knight.png"),
     });
 }
 
@@ -109,7 +94,24 @@ fn setup(mut commands: Commands, mut camera_zoom: Query<&mut Zoom, With<Camera>>
             unit: Unit::Knight,
             ..default()
         },
-        ..default()
+        transform: TransformBundle {
+            local: Transform::from_xyz(-100.0, 0.0, 0.0),
+            ..default()
+        },
+    });
+
+    commands.spawn(UnitSpawnBundle {
+        spawn: UnitSpawn {
+            formation: Formation::Box,
+            unit_count: 10,
+            team: Team::Enemy,
+            unit: Unit::Knight,
+            ..default()
+        },
+        transform: TransformBundle {
+            local: Transform::from_xyz(100.0, 0.0, 0.0),
+            ..default()
+        },
     });
 }
 
@@ -224,15 +226,23 @@ fn spawn_sprites(
 
         match unit {
             Unit::Archer => {
-                commands.entity(ent).insert(SpriteSheetBundle {
-                    texture_atlas: sprites.archer.clone(),
-                    ..default()
-                });
+                let atlas = texture_atlases.add(TextureAtlas::from_grid(
+                    sprites.archer.clone(),
+                    Unit::Archer.sprite_size(),
+                    3,
+                    1,
+                    Some(Vec2::splat(1.0)),
+                    Some(Vec2::splat(1.0)),
+                ));
+
+                commands
+                    .entity(ent)
+                    .insert((TextureAtlasSprite::new(0), atlas));
             }
 
             Unit::Knight => {
                 let atlas = texture_atlases.add(TextureAtlas::from_grid(
-                    sprites.knight_texture.clone(),
+                    sprites.knight.clone(),
                     Unit::Knight.sprite_size(),
                     3,
                     1,
