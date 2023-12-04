@@ -50,7 +50,7 @@ pub fn spawn_units<T: Bundle + Clone + Default>(
             x += transform.translation.x;
             y += transform.translation.y;
 
-            info!("Spawning unit at ({}, {})", x, y);
+            info!("Spawning {:?} unit at ({}, {})", spawn.team, x, y);
 
             commands.spawn((
                 spawn.unit.clone(),
