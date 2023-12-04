@@ -1,37 +1,44 @@
 use bevy::prelude::*;
 
-use super::{ai::UnitAI, Health, UnitSprite};
+use super::{
+    ai::{AttackRange, MovementSpeed},
+    Health, UnitSprite,
+};
 
 #[derive(Bundle, Clone)]
 pub struct KnightBundle {
-    pub ai: UnitAI,
     pub sprite: UnitSprite,
     pub health: Health,
+    pub range: AttackRange,
+    pub speed: MovementSpeed,
 }
 
 impl Default for KnightBundle {
     fn default() -> Self {
         Self {
-            ai: UnitAI::Melee,
             sprite: UnitSprite::Knight,
             health: Health(100.0),
+            range: AttackRange(5.0),
+            speed: MovementSpeed(10.0),
         }
     }
 }
 
 #[derive(Bundle, Clone)]
 pub struct ArcherBundle {
-    pub ai: UnitAI,
     pub sprite: UnitSprite,
     pub health: Health,
+    pub range: AttackRange,
+    pub speed: MovementSpeed,
 }
 
 impl Default for ArcherBundle {
     fn default() -> Self {
         Self {
-            ai: UnitAI::Ranged,
             sprite: UnitSprite::Archer,
             health: Health(50.0),
+            range: AttackRange(50.0),
+            speed: MovementSpeed(5.0),
         }
     }
 }

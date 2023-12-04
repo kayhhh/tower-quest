@@ -15,6 +15,7 @@ impl Plugin for UnitsPlugin {
             .add_systems(
                 Update,
                 (
+                    (ai::set_target, ai::move_units).chain(),
                     spawn::spawn_sprites,
                     spawn::spawn_units::<presets::KnightBundle>,
                     spawn::spawn_units::<presets::ArcherBundle>,
@@ -63,7 +64,7 @@ impl UnitSprite {
 #[derive(Component, Clone, Default)]
 pub struct Health(pub f32);
 
-#[derive(Component, Clone, Debug, Default)]
+#[derive(Component, Clone, Debug, Default, PartialEq)]
 pub enum Team {
     #[default]
     Player,
