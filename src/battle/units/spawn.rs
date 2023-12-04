@@ -15,6 +15,8 @@ pub struct UnitSpawn<T: Bundle + Default> {
     pub formation: Formation,
     /// Number of units to spawn
     pub unit_count: usize,
+    /// Size of each unit
+    pub unit_size: Vec2,
     /// Whether the units have been spawned yet
     pub spawned: bool,
 }
@@ -41,8 +43,8 @@ pub fn spawn_units<T: Bundle + Clone + Default>(
         };
 
         for (mut x, mut y) in coords {
-            x *= 11.0;
-            y *= 8.0;
+            x *= spawn.unit_size.x;
+            y *= spawn.unit_size.y;
 
             x += transform.translation.x;
             y += transform.translation.y;
