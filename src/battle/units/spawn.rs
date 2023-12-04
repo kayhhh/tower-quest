@@ -2,13 +2,6 @@ use bevy::prelude::*;
 
 use super::{Formation, Team, UnitSprite, UnitSprites};
 
-#[derive(Default)]
-pub enum SpawnableUnit {
-    #[default]
-    Knight,
-    Archer,
-}
-
 #[derive(Component, Default)]
 pub struct UnitSpawn<T: Bundle + Default> {
     pub unit: T,
