@@ -54,7 +54,6 @@ impl UnitSprite {
 #[derive(Bundle, Clone)]
 pub struct KnightBundle {
     pub sprite: UnitSprite,
-    pub team: Team,
     pub health: Health,
 }
 
@@ -62,7 +61,6 @@ impl Default for KnightBundle {
     fn default() -> Self {
         Self {
             sprite: UnitSprite::Knight,
-            team: Team::default(),
             health: Health(100.0),
         }
     }

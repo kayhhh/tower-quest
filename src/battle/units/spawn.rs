@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use super::{Formation, UnitSprite, UnitSprites};
+use super::{Formation, Team, UnitSprite, UnitSprites};
 
 #[derive(Default)]
 pub enum SpawnableUnit {
@@ -12,6 +12,7 @@ pub enum SpawnableUnit {
 #[derive(Component, Default)]
 pub struct UnitSpawn<T: Bundle + Default> {
     pub unit: T,
+    pub team: Team,
     pub formation: Formation,
     /// Number of units to spawn
     pub unit_count: usize,
@@ -53,6 +54,7 @@ pub fn spawn_units<T: Bundle + Clone + Default>(
 
             commands.spawn((
                 spawn.unit.clone(),
+                spawn.team.clone(),
                 TransformBundle::from_transform(Transform::from_xyz(x, y, 0.0)),
                 VisibilityBundle::default(),
             ));
