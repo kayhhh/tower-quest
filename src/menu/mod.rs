@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_round_ui::{
     autosize::{RoundUiAutosizeNode, RoundUiAutosizeNodePadding},
-    prelude::{RoundUiBorder, RoundUiMaterial, RoundUiOffset},
+    prelude::{RoundUiBorder, RoundUiMaterial},
 };
 
 use crate::GameState;

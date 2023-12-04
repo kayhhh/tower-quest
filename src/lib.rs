@@ -1,10 +1,10 @@
 use bevy::{core_pipeline::clear_color::ClearColorConfig, prelude::*};
 use bevy_round_ui::prelude::RoundUiPlugin;
-use postprocessing::PostProcessSettings;
+use zoom::Zoom;
 
 mod battle;
 mod menu;
-mod postprocessing;
+mod zoom;
 
 pub fn start() {
     App::new()
@@ -13,7 +13,7 @@ pub fn start() {
             RoundUiPlugin,
             battle::BattlePlugin,
             menu::MenuPlugin,
-            postprocessing::PostProcessPlugin,
+            zoom::ZoomPlugin,
         ))
         .add_state::<GameState>()
         .add_systems(Startup, setup)
@@ -37,6 +37,6 @@ fn setup(mut commands: Commands) {
             },
             ..default()
         },
-        PostProcessSettings::default(),
+        Zoom::default(),
     ));
 }
