@@ -9,6 +9,7 @@ use crate::GameState;
 use self::button::{ButtonAction, ButtonStyle, RoundButton};
 
 mod button;
+pub mod colors;
 
 pub struct MenuPlugin;
 
@@ -43,11 +44,10 @@ pub fn setup(
     let panel_height = 400.0;
 
     let panel_material = materials.add(RoundUiMaterial {
-        background_color: Color::hex("5cb3af").unwrap(),
-        border_color: Color::WHITE,
+        background_color: Color::hex(colors::ACCENT).unwrap(),
         border_radius: RoundUiBorder::all(20.0).into(),
         size: Vec2::new(panel_width, panel_height),
-        offset: RoundUiOffset::all(6.0).into(),
+        ..default()
     });
 
     commands
@@ -78,22 +78,21 @@ pub fn setup(
                 ..default()
             })
             .with_children(|p| {
-                // Spawn the title
                 p.spawn(NodeBundle {
                     style: Style {
                         align_items: AlignItems::Center,
                         justify_content: JustifyContent::Center,
-                        margin: UiRect::bottom(Val::Px(30.)),
+                        bottom: Val::Px(40.0),
                         ..default()
                     },
                     ..default()
                 })
                 .with_children(|p| {
                     p.spawn(TextBundle::from_section(
-                        "TOWER QUEST",
+                        "TOWER QUEST 3200",
                         TextStyle {
-                            color: Color::WHITE,
-                            font_size: 40.0,
+                            color: Color::hex(colors::DARK).unwrap(),
+                            font_size: 44.0,
                             font: font.clone(),
                         },
                     ));
@@ -136,7 +135,7 @@ fn spawn_button(
             p.spawn(TextBundle::from_section(
                 text,
                 TextStyle {
-                    color: Color::WHITE,
+                    color: Color::hex(colors::DARK).unwrap(),
                     font_size: 20.0,
                     font,
                 },

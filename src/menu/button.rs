@@ -3,6 +3,8 @@ use bevy_round_ui::prelude::{RoundUiBorder, RoundUiMaterial, RoundUiOffset};
 
 use crate::GameState;
 
+use super::colors;
+
 #[derive(Component)]
 pub struct RoundButton;
 
@@ -31,21 +33,21 @@ impl FromWorld for ButtonStyle {
             width,
             height,
             default: materials.add(RoundUiMaterial {
-                background_color: Color::hex("#F76161").unwrap(),
-                border_color: Color::hex("#A53A3D").unwrap(),
+                background_color: Color::hex(colors::PRIMARY).unwrap(),
+                border_color: Color::hex(colors::PRIMARY_DARK).unwrap(),
                 border_radius: border_radius.into(),
                 size: Vec2::new(width, height),
                 offset: RoundUiOffset::bottom(offset).into(),
             }),
             hover: materials.add(RoundUiMaterial {
-                background_color: Color::hex("#F61A39").unwrap(),
-                border_color: Color::hex("#A0102A").unwrap(),
+                background_color: Color::hex(colors::PRIMARY_LIGHT).unwrap(),
+                border_color: Color::hex(colors::PRIMARY).unwrap(),
                 border_radius: border_radius.into(),
                 size: Vec2::new(width, height),
                 offset: RoundUiOffset::bottom(offset).into(),
             }),
             press: materials.add(RoundUiMaterial {
-                background_color: Color::hex("#A0102A").unwrap(),
+                background_color: Color::hex(colors::PRIMARY_DARK).unwrap(),
                 border_color: Color::NONE,
                 border_radius: border_radius.into(),
                 size: Vec2::new(width, height),
