@@ -20,11 +20,7 @@ pub struct UnitSprites {
     knight: Handle<Image>,
 }
 
-fn load_sprites(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
-) {
+fn load_sprites(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.insert_resource(UnitSprites {
         archer: asset_server.load("sprites/Knight.png"),
         knight: asset_server.load("sprites/Knight.png"),
