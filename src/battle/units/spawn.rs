@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 
+use crate::battle::units::{Health, UnitBundle};
+
 use super::{Formation, Team, Unit, UnitSprites};
 
 #[derive(Component, Default)]
@@ -40,23 +42,16 @@ pub fn spawn_units(mut commands: Commands, mut spawns: Query<(&mut UnitSpawn, &T
 
             info!("Spawning {:?} at ({}, {})", spawn.unit, x, y);
 
-            let mut ent = commands.spawn((
-                TransformBundle {
+            commands.spawn(UnitBundle {
+                unit: spawn.unit.clone(),
+                team: spawn.team.clone(),
+                health: Health(spawn.unit.max_health()),
+                transform: TransformBundle {
                     local: Transform::from_xyz(x, y, 0.0),
                     ..default()
                 },
-                VisibilityBundle::default(),
-            ));
-
-            match spawn.unit {
-                Unit::Knight => ent.insert(Unit::Knight),
-                Unit::Archer => ent.insert(Unit::Archer),
-            };
-
-            match spawn.team {
-                Team::Player => ent.insert(Team::Player),
-                Team::Enemy => ent.insert(Team::Enemy),
-            };
+                ..default()
+            });
         }
 
         spawn.spawned = true;

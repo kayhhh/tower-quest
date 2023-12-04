@@ -31,7 +31,7 @@ fn load_sprites(mut commands: Commands, asset_server: Res<AssetServer>) {
     });
 }
 
-#[derive(Component, Debug, Default, PartialEq)]
+#[derive(Component, Clone, Debug, Default, PartialEq)]
 pub enum Unit {
     Archer,
     #[default]
@@ -45,9 +45,19 @@ impl Unit {
             Unit::Archer => Vec2::new(11.0, 8.0),
         }
     }
+
+    pub fn max_health(&self) -> f32 {
+        match self {
+            Unit::Knight => 100.0,
+            Unit::Archer => 50.0,
+        }
+    }
 }
 
 #[derive(Component, Default)]
+pub struct Health(pub f32);
+
+#[derive(Component, Clone, Default)]
 pub enum Team {
     #[default]
     Player,
@@ -60,6 +70,15 @@ pub enum Formation {
     Column,
     #[default]
     Box,
+}
+
+#[derive(Bundle, Default)]
+pub struct UnitBundle {
+    pub unit: Unit,
+    pub team: Team,
+    pub health: Health,
+    pub transform: TransformBundle,
+    pub visibility: VisibilityBundle,
 }
 
 fn despawn_units(mut commands: Commands, units: Query<Entity, With<Unit>>) {
