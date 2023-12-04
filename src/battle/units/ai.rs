@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-#[derive(Component, Default)]
+#[derive(Component, Clone, Default)]
 pub enum UnitAI {
     #[default]
     Melee,

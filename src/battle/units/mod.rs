@@ -3,6 +3,7 @@ use bevy::prelude::*;
 use crate::GameState;
 
 mod ai;
+pub mod presets;
 pub mod spawn;
 
 pub struct UnitsPlugin;
@@ -13,11 +14,19 @@ impl Plugin for UnitsPlugin {
             .add_systems(Startup, load_sprites)
             .add_systems(
                 Update,
-                (spawn::spawn_units::<KnightBundle>, spawn::spawn_sprites),
+                (
+                    spawn::spawn_sprites,
+                    spawn::spawn_units::<presets::KnightBundle>,
+                    spawn::spawn_units::<presets::ArcherBundle>,
+                ),
             )
             .add_systems(
                 OnExit(GameState::Battle),
-                (despawn_units, spawn::reset_spawns::<KnightBundle>),
+                (
+                    despawn_units,
+                    spawn::reset_spawns::<presets::KnightBundle>,
+                    spawn::reset_spawns::<presets::ArcherBundle>,
+                ),
             );
     }
 }
@@ -47,21 +56,6 @@ impl UnitSprite {
         match self {
             UnitSprite::Knight => Vec2::new(11.0, 8.0),
             UnitSprite::Archer => Vec2::new(11.0, 8.0),
-        }
-    }
-}
-
-#[derive(Bundle, Clone)]
-pub struct KnightBundle {
-    pub sprite: UnitSprite,
-    pub health: Health,
-}
-
-impl Default for KnightBundle {
-    fn default() -> Self {
-        Self {
-            sprite: UnitSprite::Knight,
-            health: Health(100.0),
         }
     }
 }

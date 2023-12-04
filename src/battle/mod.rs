@@ -3,8 +3,9 @@ use bevy::prelude::*;
 use crate::{zoom::Zoom, GameState};
 
 use self::units::{
+    presets::KnightBundle,
     spawn::{UnitSpawn, UnitSpawnBundle},
-    Formation, KnightBundle, Team, UnitSprite,
+    Formation, Team, UnitSprite,
 };
 
 pub mod units;
