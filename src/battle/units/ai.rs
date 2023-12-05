@@ -162,7 +162,7 @@ pub fn attack(
         };
 
         if health.0 <= 0.0 {
-            info!("Target already dead!");
+            debug!("Target already dead!");
             continue;
         }
 
@@ -174,8 +174,6 @@ pub fn attack(
         health.0 -= damage.0;
 
         if health.0 <= 0.0 {
-            info!("Target dead!");
-
             commands
                 .entity(target.0)
                 .insert((Dead, Visibility::Hidden))

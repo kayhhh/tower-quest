@@ -99,12 +99,15 @@ pub fn spawn_sprites(
     mut commands: Commands,
     sprites: Res<UnitSprites>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
-    mut units: Query<(Entity, &UnitSprite, &Transform), Without<TextureAtlasSprite>>,
+    mut units: Query<(Entity, &UnitSprite, &Team, &Transform), Without<TextureAtlasSprite>>,
 ) {
-    for (ent, unit, transform) in units.iter_mut() {
+    for (ent, unit, team, transform) in units.iter_mut() {
         let atlas = match unit {
             UnitSprite::Archer => texture_atlases.add(TextureAtlas::from_grid(
-                sprites.archer.clone(),
+                match team {
+                    Team::Player => sprites.archer_friendly.clone(),
+                    Team::Enemy => sprites.archer_enemy.clone(),
+                },
                 UnitSprite::Archer.sprite_size(),
                 3,
                 1,
@@ -113,7 +116,10 @@ pub fn spawn_sprites(
             )),
 
             UnitSprite::Knight => texture_atlases.add(TextureAtlas::from_grid(
-                sprites.knight.clone(),
+                match team {
+                    Team::Player => sprites.knight_friendly.clone(),
+                    Team::Enemy => sprites.knight_enemy.clone(),
+                },
                 UnitSprite::Knight.sprite_size(),
                 3,
                 1,

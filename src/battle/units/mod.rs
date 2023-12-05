@@ -39,14 +39,18 @@ impl Plugin for UnitsPlugin {
 
 #[derive(Default, Resource)]
 pub struct UnitSprites {
-    archer: Handle<Image>,
-    knight: Handle<Image>,
+    archer_enemy: Handle<Image>,
+    archer_friendly: Handle<Image>,
+    knight_enemy: Handle<Image>,
+    knight_friendly: Handle<Image>,
 }
 
 fn load_sprites(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.insert_resource(UnitSprites {
-        archer: asset_server.load("sprites/Knight.png"),
-        knight: asset_server.load("sprites/Knight.png"),
+        archer_enemy: asset_server.load("sprites/ArcherEnemy.png"),
+        archer_friendly: asset_server.load("sprites/ArcherFriendly.png"),
+        knight_enemy: asset_server.load("sprites/KnightEnemy.png"),
+        knight_friendly: asset_server.load("sprites/KnightFriendly.png"),
     });
 }
 
