@@ -44,7 +44,7 @@ pub struct CameraVelocity(Vec3);
 
 const MOVE_SPEED: f32 = 10.0;
 const PADDING: f32 = 100.0;
-const ZOOM_SPEED: f32 = 0.08;
+const ZOOM_SPEED: f32 = 0.1;
 
 pub fn set_camera_velocity(
     time: Res<Time>,

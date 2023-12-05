@@ -56,7 +56,7 @@ pub fn animate_atlas(
 #[derive(Component)]
 pub struct LastFlip(f32);
 
-const FLIP_COOLDOWN: f32 = 0.1;
+const FLIP_COOLDOWN: f32 = 0.05;
 
 pub fn flip_units(
     mut commands: Commands,
