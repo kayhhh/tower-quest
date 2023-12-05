@@ -25,14 +25,14 @@ impl Default for KnightBundle {
     fn default() -> Self {
         Self {
             attack_speed: AttackCooldown(1.0),
-            collider: Collider::ball(2.5),
+            collider: Collider::ball(3.0),
             damage: AttackDamage(10.0),
             density: ColliderDensity(1.0),
             health: Health(100.0),
             locked: LockedAxes::ROTATION_LOCKED,
             movement_speed: MovementSpeed(15.0),
             movement_style: MovementStyle::WithinRange,
-            range: AttackRange(8.0),
+            range: AttackRange(9.0),
             rigid_body: RigidBody::Dynamic,
             sprite: UnitSprite::Knight,
         }

@@ -1,11 +1,9 @@
 use bevy::{core_pipeline::clear_color::ClearColorConfig, prelude::*};
 use bevy_round_ui::prelude::RoundUiPlugin;
 use bevy_xpbd_2d::{plugins::PhysicsPlugins, resources::Gravity};
-use zoom::Zoom;
 
 mod battle;
 mod menu;
-mod zoom;
 
 pub fn start() {
     App::new()
@@ -16,7 +14,6 @@ pub fn start() {
             RoundUiPlugin,
             battle::BattlePlugin,
             menu::MenuPlugin,
-            zoom::ZoomPlugin,
         ))
         .insert_resource(Gravity(Vec2::ZERO))
         .add_state::<GameState>()
@@ -34,13 +31,10 @@ pub enum GameState {
 }
 
 fn setup(mut commands: Commands) {
-    commands.spawn((
-        Camera2dBundle {
-            camera_2d: Camera2d {
-                clear_color: ClearColorConfig::Custom(Color::hex(menu::colors::DARK).unwrap()),
-            },
-            ..default()
+    commands.spawn(Camera2dBundle {
+        camera_2d: Camera2d {
+            clear_color: ClearColorConfig::Custom(Color::hex(menu::colors::DARK).unwrap()),
         },
-        Zoom::default(),
-    ));
+        ..default()
+    });
 }

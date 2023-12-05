@@ -2,8 +2,8 @@ use bevy::prelude::*;
 
 use crate::GameState;
 
-mod ai;
-mod animation;
+pub mod ai;
+pub mod animation;
 pub mod presets;
 pub mod spawn;
 

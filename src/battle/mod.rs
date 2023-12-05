@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use rand::Rng;
 use rand_distr::{Distribution, Normal};
 
-use crate::{zoom::Zoom, GameState};
+use crate::GameState;
 
 use self::units::{
     presets::KnightBundle,
@@ -10,6 +10,7 @@ use self::units::{
     Formation, Team,
 };
 
+mod camera;
 pub mod units;
 
 pub struct BattlePlugin;
@@ -17,15 +18,18 @@ pub struct BattlePlugin;
 impl Plugin for BattlePlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(units::UnitsPlugin)
-            .add_systems(OnEnter(GameState::Battle), setup);
+            .add_systems(OnEnter(GameState::Battle), setup)
+            .add_systems(
+                Update,
+                (camera::calc_bounds, camera::move_camera)
+                    .chain()
+                    .run_if(in_state(GameState::Battle)),
+            );
     }
 }
 
-fn setup(mut commands: Commands, mut camera_zoom: Query<&mut Zoom, With<Camera>>) {
-    let mut camera_zoom = camera_zoom.single_mut();
-    camera_zoom.zoom_level = 3.0;
-
-    let normal = Normal::new(10.0, 2.0).unwrap();
+fn setup(mut commands: Commands) {
+    let normal = Normal::new(100.0, 2.0).unwrap();
     let mut rng = rand::thread_rng();
 
     let count_a = normal.sample(&mut rng) as usize;
