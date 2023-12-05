@@ -7,7 +7,7 @@ use crate::{zoom::Zoom, GameState};
 use self::units::{
     presets::KnightBundle,
     spawn::{UnitSpawn, UnitSpawnBundle},
-    Formation, Team, UnitSprite,
+    Formation, Team,
 };
 
 pub mod units;
@@ -45,7 +45,7 @@ fn setup(mut commands: Commands, mut camera_zoom: Query<&mut Zoom, With<Camera>>
             team: Team::Player,
             unit: KnightBundle::default(),
             unit_count: count_large,
-            unit_size: UnitSprite::Knight.sprite_size(),
+            unit_size: Vec2::splat(10.0),
             ..default()
         },
         transform: TransformBundle {
@@ -60,7 +60,7 @@ fn setup(mut commands: Commands, mut camera_zoom: Query<&mut Zoom, With<Camera>>
             team: Team::Enemy,
             unit: KnightBundle::default(),
             unit_count: count_small,
-            unit_size: UnitSprite::Knight.sprite_size(),
+            unit_size: Vec2::splat(10.0),
             ..default()
         },
         transform: TransformBundle {
