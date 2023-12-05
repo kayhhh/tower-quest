@@ -14,22 +14,25 @@ impl Plugin for UnitsPlugin {
         app.init_resource::<UnitSprites>()
             .add_event::<animation::AttackEvent>()
             .add_systems(Startup, load_sprites)
+            .add_systems(OnEnter(GameState::Battle), despawn_units)
             .add_systems(
                 Update,
                 (
                     (ai::set_target, ai::move_units, ai::attack).chain(),
-                    animation::animate_atlas,
-                    animation::animate_attack,
-                    animation::flip_units,
-                    spawn::spawn_sprites,
-                    spawn::spawn_units::<presets::KnightBundle>,
-                    spawn::spawn_units::<presets::ArcherBundle>,
+                    (
+                        animation::animate_atlas,
+                        animation::animate_attack,
+                        animation::flip_units,
+                        spawn::spawn_sprites,
+                        spawn::spawn_units::<presets::KnightBundle>,
+                        spawn::spawn_units::<presets::ArcherBundle>,
+                    )
+                        .run_if(in_state(GameState::Battle)),
                 ),
             )
             .add_systems(
                 OnExit(GameState::Battle),
                 (
-                    despawn_units,
                     spawn::reset_spawns::<presets::KnightBundle>,
                     spawn::reset_spawns::<presets::ArcherBundle>,
                 ),

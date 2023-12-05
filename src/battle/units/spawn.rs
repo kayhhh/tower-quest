@@ -21,6 +21,9 @@ pub struct UnitSpawnBundle<T: Bundle + Default> {
     pub transform: TransformBundle,
 }
 
+#[derive(Component)]
+pub struct Unit;
+
 pub fn spawn_units<T: Bundle + Clone + Default>(
     mut commands: Commands,
     mut spawns: Query<(&mut UnitSpawn<T>, &Transform)>,
@@ -43,6 +46,7 @@ pub fn spawn_units<T: Bundle + Clone + Default>(
             y += transform.translation.y;
 
             commands.spawn((
+                Unit,
                 spawn.unit.clone(),
                 spawn.team.clone(),
                 TransformBundle::from_transform(Transform::from_xyz(x, y, 0.0)),

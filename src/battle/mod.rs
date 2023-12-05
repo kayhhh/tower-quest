@@ -12,6 +12,7 @@ use self::units::{
 
 pub mod camera;
 pub mod units;
+mod victory;
 
 pub struct BattlePlugin;
 
@@ -22,17 +23,20 @@ impl Plugin for BattlePlugin {
             .add_systems(
                 Update,
                 (
-                    camera::calc_bounds,
-                    camera::set_camera_velocity,
-                    camera::apply_camera_velocity,
+                    (
+                        camera::calc_bounds,
+                        camera::set_camera_velocity,
+                        camera::apply_camera_velocity,
+                    )
+                        .chain(),
+                    victory::detect_victory,
                 )
-                    .chain()
                     .run_if(in_state(GameState::Battle)),
             );
     }
 }
 
-const INITIAL_UNITS: f32 = 50.0;
+const INITIAL_UNITS: f32 = 20.0;
 
 fn setup(mut commands: Commands) {
     let normal = Normal::new(INITIAL_UNITS, INITIAL_UNITS * 0.25).unwrap();

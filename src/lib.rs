@@ -26,9 +26,10 @@ pub fn start() {
 pub enum GameState {
     #[default]
     Menu,
-    Prep,
     Battle,
-    GameOver,
+    Victory,
+    Reward,
+    Defeat,
 }
 
 fn setup(mut commands: Commands) {
