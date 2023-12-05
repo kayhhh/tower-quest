@@ -32,8 +32,10 @@ impl Plugin for BattlePlugin {
     }
 }
 
+const INITIAL_UNITS: f32 = 20.0;
+
 fn setup(mut commands: Commands) {
-    let normal = Normal::new(200.0, 2.0).unwrap();
+    let normal = Normal::new(INITIAL_UNITS, INITIAL_UNITS * 0.25).unwrap();
     let mut rng = rand::thread_rng();
 
     let count_a = normal.sample(&mut rng) as usize;
