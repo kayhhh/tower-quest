@@ -35,7 +35,7 @@ fn setup(mut commands: Commands) {
     commands.spawn((
         Camera2dBundle {
             camera_2d: Camera2d {
-                clear_color: ClearColorConfig::Custom(Color::hex(menu::colors::DARK).unwrap()),
+                clear_color: ClearColorConfig::Custom(Color::hex(menu::colors::BG_DARK).unwrap()),
             },
             ..default()
         },

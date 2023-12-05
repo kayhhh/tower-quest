@@ -44,7 +44,7 @@ pub fn setup(
     let panel_height = 400.0;
 
     let panel_material = materials.add(RoundUiMaterial {
-        background_color: Color::hex(colors::ACCENT).unwrap(),
+        background_color: Color::hex(colors::BG).unwrap(),
         border_radius: RoundUiBorder::all(20.0).into(),
         size: Vec2::new(panel_width, panel_height),
         ..default()
@@ -91,7 +91,7 @@ pub fn setup(
                     p.spawn(TextBundle::from_section(
                         "TOWER QUEST 3200",
                         TextStyle {
-                            color: Color::hex(colors::DARK).unwrap(),
+                            color: Color::hex(colors::BG_LIGHT).unwrap(),
                             font_size: 44.0,
                             font: font.clone(),
                         },
@@ -135,7 +135,7 @@ fn spawn_button(
             p.spawn(TextBundle::from_section(
                 text,
                 TextStyle {
-                    color: Color::hex(colors::DARK).unwrap(),
+                    color: Color::hex(colors::ACCENT).unwrap(),
                     font_size: 20.0,
                     font,
                 },
