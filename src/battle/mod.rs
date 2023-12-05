@@ -32,7 +32,7 @@ impl Plugin for BattlePlugin {
     }
 }
 
-const INITIAL_UNITS: f32 = 20.0;
+const INITIAL_UNITS: f32 = 50.0;
 
 fn setup(mut commands: Commands) {
     let normal = Normal::new(INITIAL_UNITS, INITIAL_UNITS * 0.25).unwrap();
@@ -84,7 +84,7 @@ fn rand_formation() -> Formation {
     let mut rng = rand::thread_rng();
 
     match rng.gen_range(0..=1) {
-        0 => Formation::Column,
+        0 => Formation::Box,
         _ => Formation::Box,
     }
 }

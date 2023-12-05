@@ -37,6 +37,10 @@ fn setup(mut commands: Commands) {
             camera_2d: Camera2d {
                 clear_color: ClearColorConfig::Custom(Color::hex(menu::colors::BG_DARK).unwrap()),
             },
+            transform: Transform {
+                scale: Vec3::splat(0.75),
+                ..default()
+            },
             ..default()
         },
         CameraVelocity::default(),
