@@ -59,7 +59,7 @@ fn setup(mut commands: Commands) {
             ..default()
         },
         transform: TransformBundle {
-            local: Transform::from_xyz(-100.0, 0.0, 0.0),
+            local: Transform::from_xyz(-100.0, rng.gen_range(-100.0..100.0), 0.0),
             ..default()
         },
     });
@@ -74,7 +74,7 @@ fn setup(mut commands: Commands) {
             ..default()
         },
         transform: TransformBundle {
-            local: Transform::from_xyz(100.0, 0.0, 0.0),
+            local: Transform::from_xyz(100.0, rng.gen_range(-100.0..100.0), 0.0),
             ..default()
         },
     });
