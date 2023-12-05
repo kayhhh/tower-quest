@@ -1,3 +1,4 @@
+use battle::camera::CameraVelocity;
 use bevy::{core_pipeline::clear_color::ClearColorConfig, prelude::*};
 use bevy_round_ui::prelude::RoundUiPlugin;
 use bevy_xpbd_2d::{plugins::PhysicsPlugins, resources::Gravity};
@@ -31,10 +32,13 @@ pub enum GameState {
 }
 
 fn setup(mut commands: Commands) {
-    commands.spawn(Camera2dBundle {
-        camera_2d: Camera2d {
-            clear_color: ClearColorConfig::Custom(Color::hex(menu::colors::DARK).unwrap()),
+    commands.spawn((
+        Camera2dBundle {
+            camera_2d: Camera2d {
+                clear_color: ClearColorConfig::Custom(Color::hex(menu::colors::DARK).unwrap()),
+            },
+            ..default()
         },
-        ..default()
-    });
+        CameraVelocity::default(),
+    ));
 }

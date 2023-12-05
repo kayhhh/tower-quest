@@ -36,15 +36,18 @@ pub fn calc_bounds(
 #[derive(Component)]
 pub struct CameraTarget(Transform);
 
-const MOVE_SPEED: f32 = 1.0;
-const PADDING: f32 = 100.0;
-const ZOOM_SPEED: f32 = 0.2;
+#[derive(Component, Default)]
+pub struct CameraVelocity(Vec3);
 
-pub fn move_camera(
+const MOVE_SPEED: f32 = 0.1;
+const PADDING: f32 = 100.0;
+const ZOOM_SPEED: f32 = 0.1;
+
+pub fn set_camera_velocity(
     time: Res<Time>,
-    mut camera: Query<(&Frustum, &TargetBounds, &mut Transform), With<Camera>>,
+    mut camera: Query<(&Frustum, &TargetBounds, &Transform, &mut CameraVelocity), With<Camera>>,
 ) {
-    for (frustum, bounds, mut transform) in camera.iter_mut() {
+    for (frustum, bounds, transform, mut velocity) in camera.iter_mut() {
         let current = transform.translation.truncate();
 
         // Find a target transform + zoom that covers the target bounds
@@ -55,12 +58,13 @@ pub fn move_camera(
 
         // If we have extra space on every side, zoom in
         // Otherwise, zoom out
-        if left > PADDING && right > PADDING && bottom > PADDING && top > PADDING {
-            info!("Zooming in");
-            transform.scale -= time.delta_seconds() * ZOOM_SPEED;
+        let min = left.min(right).min(bottom).min(top) - PADDING;
+        let speed = ZOOM_SPEED * min.abs() / PADDING;
+
+        if min > 0.0 {
+            velocity.0.z -= time.delta_seconds() * speed;
         } else {
-            info!("Zooming out");
-            transform.scale += time.delta_seconds() * ZOOM_SPEED;
+            velocity.0.z += time.delta_seconds() * speed;
         }
 
         // Move to center of bounds
@@ -70,9 +74,27 @@ pub fn move_camera(
             continue;
         }
 
-        let new = current + (target - current) * time.delta_seconds() * MOVE_SPEED;
+        let dir = target - current;
+        let dir = dir.normalize();
+        let acc = dir * time.delta_seconds() * MOVE_SPEED;
 
-        transform.translation.x = new.x;
-        transform.translation.y = new.y;
+        velocity.0.x += acc.x;
+        velocity.0.y += acc.y;
+    }
+}
+
+pub fn apply_camera_velocity(
+    time: Res<Time>,
+    mut camera: Query<(&mut Transform, &mut CameraVelocity), With<Camera>>,
+) {
+    for (mut transform, mut velocity) in camera.iter_mut() {
+        let vel = velocity.0 * time.delta_seconds();
+
+        transform.translation.x += vel.x;
+        transform.translation.y += vel.y;
+        transform.scale += vel.z;
+
+        // Dampen velocity
+        velocity.0 -= vel;
     }
 }

@@ -10,7 +10,7 @@ use self::units::{
     Formation, Team,
 };
 
-mod camera;
+pub mod camera;
 pub mod units;
 
 pub struct BattlePlugin;
@@ -21,7 +21,11 @@ impl Plugin for BattlePlugin {
             .add_systems(OnEnter(GameState::Battle), setup)
             .add_systems(
                 Update,
-                (camera::calc_bounds, camera::move_camera)
+                (
+                    camera::calc_bounds,
+                    camera::set_camera_velocity,
+                    camera::apply_camera_velocity,
+                )
                     .chain()
                     .run_if(in_state(GameState::Battle)),
             );
@@ -29,7 +33,7 @@ impl Plugin for BattlePlugin {
 }
 
 fn setup(mut commands: Commands) {
-    let normal = Normal::new(100.0, 2.0).unwrap();
+    let normal = Normal::new(200.0, 2.0).unwrap();
     let mut rng = rand::thread_rng();
 
     let count_a = normal.sample(&mut rng) as usize;
