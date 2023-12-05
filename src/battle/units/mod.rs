@@ -74,7 +74,6 @@ pub enum Team {
 
 #[derive(Default)]
 pub enum Formation {
-    Line,
     Column,
     #[default]
     Box,

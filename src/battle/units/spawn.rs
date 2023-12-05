@@ -31,7 +31,6 @@ pub fn spawn_units<T: Bundle + Clone + Default>(
         }
 
         let coords = match spawn.formation {
-            Formation::Line => coords_line(spawn.unit_count),
             Formation::Column => coords_column(spawn.unit_count),
             Formation::Box => coords_box(spawn.unit_count),
         };
@@ -43,8 +42,6 @@ pub fn spawn_units<T: Bundle + Clone + Default>(
             x += transform.translation.x;
             y += transform.translation.y;
 
-            info!("Spawning {:?} unit at ({}, {})", spawn.team, x, y);
-
             commands.spawn((
                 spawn.unit.clone(),
                 spawn.team.clone(),
@@ -55,21 +52,6 @@ pub fn spawn_units<T: Bundle + Clone + Default>(
 
         spawn.spawned = true;
     }
-}
-
-fn coords_line(count: usize) -> Vec<(f32, f32)> {
-    let mut coords = Vec::new();
-
-    let mut x = 0.0;
-    let y = 0.0;
-
-    for _ in 0..count {
-        coords.push((x, y));
-
-        x += 1.0;
-    }
-
-    coords
 }
 
 fn coords_column(count: usize) -> Vec<(f32, f32)> {
