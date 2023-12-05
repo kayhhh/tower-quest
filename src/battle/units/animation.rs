@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_xpbd_2d::components::LinearVelocity;
 
 #[derive(Event)]
 pub struct AttackEvent {
@@ -49,5 +50,11 @@ pub fn animate_atlas(
         let num_frames = animation.end - animation.start;
         let frame = (timer.0.percent() * num_frames as f32) as usize;
         sprite.index = animation.start + frame;
+    }
+}
+
+pub fn flip_units(mut units: Query<(&mut TextureAtlasSprite, &LinearVelocity)>) {
+    for (mut sprite, velocity) in units.iter_mut() {
+        sprite.flip_x = velocity.x < 0.0;
     }
 }

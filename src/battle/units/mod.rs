@@ -20,6 +20,7 @@ impl Plugin for UnitsPlugin {
                     (ai::set_target, ai::move_units, ai::attack).chain(),
                     animation::animate_atlas,
                     animation::animate_attack,
+                    animation::flip_units,
                     spawn::spawn_sprites,
                     spawn::spawn_units::<presets::KnightBundle>,
                     spawn::spawn_units::<presets::ArcherBundle>,
