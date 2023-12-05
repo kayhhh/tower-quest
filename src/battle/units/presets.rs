@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_xpbd_2d::prelude::*;
 
 use super::{
-    ai::{AttackCooldown, AttackDamage, AttackRange, Health, MovementSpeed},
+    ai::{AttackCooldown, AttackDamage, AttackRange, Health, MovementSpeed, MovementStyle},
     UnitSprite,
 };
 
@@ -15,6 +15,7 @@ pub struct KnightBundle {
     pub health: Health,
     pub locked: LockedAxes,
     pub movement_speed: MovementSpeed,
+    pub movement_style: MovementStyle,
     pub range: AttackRange,
     pub rigid_body: RigidBody,
     pub sprite: UnitSprite,
@@ -30,6 +31,7 @@ impl Default for KnightBundle {
             health: Health(100.0),
             locked: LockedAxes::ROTATION_LOCKED,
             movement_speed: MovementSpeed(15.0),
+            movement_style: MovementStyle::WithinRange,
             range: AttackRange(8.0),
             rigid_body: RigidBody::Dynamic,
             sprite: UnitSprite::Knight,
@@ -46,6 +48,7 @@ pub struct ArcherBundle {
     pub health: Health,
     pub locked: LockedAxes,
     pub movement_speed: MovementSpeed,
+    pub movement_style: MovementStyle,
     pub range: AttackRange,
     pub rigid_body: RigidBody,
     pub sprite: UnitSprite,
@@ -61,6 +64,7 @@ impl Default for ArcherBundle {
             health: Health(50.0),
             locked: LockedAxes::ROTATION_LOCKED,
             movement_speed: MovementSpeed(10.0),
+            movement_style: MovementStyle::WithinRange,
             range: AttackRange(50.0),
             rigid_body: RigidBody::Dynamic,
             sprite: UnitSprite::Archer,

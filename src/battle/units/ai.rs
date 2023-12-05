@@ -6,8 +6,16 @@ use super::{animation::AttackEvent, Team};
 #[derive(Component, Clone, Default)]
 pub struct MovementSpeed(pub f32);
 
+#[derive(Component, Clone, Default)]
+pub enum MovementStyle {
+    #[default]
+    Direct,
+    WithinRange,
+}
+
 #[derive(Component)]
 pub enum Movement {
+    Direct { target: Vec3 },
     WithinRange { target: Vec3, range: f32 },
 }
 
@@ -34,13 +42,13 @@ pub struct Dead;
 
 pub fn set_target(
     mut commands: Commands,
-    units: Query<(Entity, &Team, &Transform, &AttackRange), Without<Dead>>,
+    units: Query<(Entity, &MovementStyle, &Team, &Transform, &AttackRange), Without<Dead>>,
 ) {
-    for (ent, team, transform, range) in units.iter() {
+    for (ent, style, team, transform, range) in units.iter() {
         let nearest_enemy = units
             .iter()
-            .filter(|(_, t, _, _)| **t != *team)
-            .map(|(e, _, t, _)| (e, t, transform.translation.distance(t.translation)))
+            .filter(|(_, _, t, _, _)| **t != *team)
+            .map(|(e, _, _, t, _)| (e, t, transform.translation.distance(t.translation)))
             .min_by(|(_, _, d1), (_, _, d2)| d1.partial_cmp(d2).unwrap());
 
         let (target_ent, target_translation) = match nearest_enemy {
@@ -51,13 +59,22 @@ pub fn set_target(
             }
         };
 
-        commands.entity(ent).insert((
-            AttackTarget(target_ent),
-            Movement::WithinRange {
-                target: target_translation,
-                range: range.0,
-            },
-        ));
+        let mut entity = commands.entity(ent);
+        entity.insert(AttackTarget(target_ent));
+
+        match style {
+            MovementStyle::Direct => {
+                entity.insert(Movement::Direct {
+                    target: target_translation,
+                });
+            }
+            MovementStyle::WithinRange => {
+                entity.insert(Movement::WithinRange {
+                    target: target_translation,
+                    range: range.0,
+                });
+            }
+        };
     }
 }
 
@@ -73,7 +90,11 @@ pub fn move_units(
     >,
 ) {
     for (transform, mut velocity, movement, speed) in units.iter_mut() {
-        match movement {
+        let direction = match movement {
+            Movement::Direct { target } => {
+                let direction = *target - transform.translation;
+                direction.normalize()
+            }
             Movement::WithinRange { target, range } => {
                 let distance = transform.translation.distance(*target);
 
@@ -82,13 +103,13 @@ pub fn move_units(
                 }
 
                 let direction = *target - transform.translation;
-                let direction = direction.normalize();
-
-                let v = direction * speed.0;
-                velocity.x = v.x;
-                velocity.y = v.y;
+                direction.normalize()
             }
-        }
+        };
+
+        let v = direction * speed.0;
+        velocity.x = v.x;
+        velocity.y = v.y;
     }
 }
 
