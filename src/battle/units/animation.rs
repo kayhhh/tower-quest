@@ -53,8 +53,42 @@ pub fn animate_atlas(
     }
 }
 
-pub fn flip_units(mut units: Query<(&mut TextureAtlasSprite, &LinearVelocity)>) {
-    for (mut sprite, velocity) in units.iter_mut() {
-        sprite.flip_x = velocity.x < 0.0;
+#[derive(Component)]
+pub struct LastFlip(f32);
+
+const FLIP_COOLDOWN: f32 = 0.1;
+
+pub fn flip_units(
+    mut commands: Commands,
+    time: Res<Time>,
+    mut units: Query<(
+        Entity,
+        &mut TextureAtlasSprite,
+        &LinearVelocity,
+        Option<&LastFlip>,
+    )>,
+) {
+    for (ent, mut sprite, velocity, last) in units.iter_mut() {
+        let new_flip = match velocity.x.total_cmp(&0.0) {
+            std::cmp::Ordering::Greater => false,
+            std::cmp::Ordering::Equal => sprite.flip_x,
+            std::cmp::Ordering::Less => true,
+        };
+
+        if sprite.flip_x == new_flip {
+            continue;
+        }
+
+        let now = time.elapsed_seconds();
+
+        if let Some(last) = last {
+            if now - last.0 < FLIP_COOLDOWN {
+                continue;
+            }
+        }
+
+        sprite.flip_x = new_flip;
+
+        commands.entity(ent).insert(LastFlip(now));
     }
 }
