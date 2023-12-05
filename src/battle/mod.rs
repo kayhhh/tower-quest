@@ -25,10 +25,10 @@ fn setup(mut commands: Commands, mut camera_zoom: Query<&mut Zoom, With<Camera>>
 
     commands.spawn(UnitSpawnBundle {
         spawn: UnitSpawn {
-            formation: Formation::Box,
+            formation: Formation::Column,
             team: Team::Player,
             unit: KnightBundle::default(),
-            unit_count: 10,
+            unit_count: 3,
             unit_size: UnitSprite::Knight.sprite_size(),
             ..default()
         },
@@ -40,10 +40,10 @@ fn setup(mut commands: Commands, mut camera_zoom: Query<&mut Zoom, With<Camera>>
 
     commands.spawn(UnitSpawnBundle {
         spawn: UnitSpawn {
-            formation: Formation::Box,
+            formation: Formation::Column,
             team: Team::Enemy,
             unit: KnightBundle::default(),
-            unit_count: 10,
+            unit_count: 3,
             unit_size: UnitSprite::Knight.sprite_size(),
             ..default()
         },

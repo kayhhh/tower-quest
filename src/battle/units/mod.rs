@@ -3,6 +3,7 @@ use bevy::prelude::*;
 use crate::GameState;
 
 mod ai;
+mod animation;
 pub mod presets;
 pub mod spawn;
 
@@ -11,11 +12,14 @@ pub struct UnitsPlugin;
 impl Plugin for UnitsPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<UnitSprites>()
+            .add_event::<animation::AttackEvent>()
             .add_systems(Startup, load_sprites)
             .add_systems(
                 Update,
                 (
                     (ai::set_target, ai::move_units, ai::attack).chain(),
+                    animation::animate_atlas,
+                    animation::animate_attack,
                     spawn::spawn_sprites,
                     spawn::spawn_units::<presets::KnightBundle>,
                     spawn::spawn_units::<presets::ArcherBundle>,

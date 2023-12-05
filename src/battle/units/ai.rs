@@ -1,6 +1,8 @@
 use bevy::prelude::*;
 
-use super::Team;
+use crate::battle::units::animation::{AnimationTimer, AtlasAnimation};
+
+use super::{animation::AttackEvent, Team};
 
 #[derive(Component, Clone, Default)]
 pub struct MovementSpeed(pub f32);
@@ -87,6 +89,7 @@ pub fn move_units(
 pub fn attack(
     mut commands: Commands,
     time: Res<Time>,
+    mut attack_events: EventWriter<AttackEvent>,
     attackers: Query<
         (
             Entity,
@@ -136,6 +139,11 @@ pub fn attack(
             continue;
         }
 
+        attack_events.send(AttackEvent {
+            attacker: ent,
+            target: target.0,
+        });
+
         health.0 -= damage.0;
 
         if health.0 <= 0.0 {
@@ -143,7 +151,8 @@ pub fn attack(
 
             commands
                 .entity(target.0)
-                .insert(Dead)
+                .insert((Dead, Visibility::Hidden))
+                .remove::<Movement>()
                 .remove::<TextureAtlasSprite>();
         }
     }
