@@ -36,7 +36,7 @@ impl Plugin for BattlePlugin {
     }
 }
 
-const INITIAL_UNITS: f32 = 20.0;
+const INITIAL_UNITS: f32 = 10.0;
 
 fn setup(mut commands: Commands) {
     let normal = Normal::new(INITIAL_UNITS, INITIAL_UNITS * 0.25).unwrap();

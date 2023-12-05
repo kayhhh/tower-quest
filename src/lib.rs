@@ -5,6 +5,7 @@ use bevy_xpbd_2d::{plugins::PhysicsPlugins, resources::Gravity};
 
 mod battle;
 mod menu;
+mod rewards;
 
 pub fn start() {
     App::new()
@@ -15,6 +16,7 @@ pub fn start() {
             RoundUiPlugin,
             battle::BattlePlugin,
             menu::MenuPlugin,
+            rewards::RewardsPlugin,
         ))
         .insert_resource(Gravity(Vec2::ZERO))
         .add_state::<GameState>()

@@ -8,7 +8,7 @@ use crate::GameState;
 
 use self::button::{ButtonAction, ButtonStyle, RoundButton};
 
-mod button;
+pub mod button;
 pub mod colors;
 
 pub struct MenuPlugin;
@@ -104,7 +104,7 @@ pub fn setup(
         });
 }
 
-fn spawn_button(
+pub fn spawn_button(
     parent: &mut ChildBuilder,
     button_style: &Res<ButtonStyle>,
     text: impl Into<String>,
