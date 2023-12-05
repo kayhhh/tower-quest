@@ -108,8 +108,8 @@ pub fn spawn_sprites(
                 UnitSprite::Archer.sprite_size(),
                 3,
                 1,
-                Some(Vec2::splat(1.0)),
-                Some(Vec2::splat(1.0)),
+                None,
+                None,
             )),
 
             UnitSprite::Knight => texture_atlases.add(TextureAtlas::from_grid(
@@ -117,8 +117,8 @@ pub fn spawn_sprites(
                 UnitSprite::Knight.sprite_size(),
                 3,
                 1,
-                Some(Vec2::splat(1.0)),
-                Some(Vec2::splat(1.0)),
+                None,
+                None,
             )),
         };
 

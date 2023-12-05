@@ -1,7 +1,5 @@
 use bevy::prelude::*;
 
-use crate::battle::units::animation::{AnimationTimer, AtlasAnimation};
-
 use super::{animation::AttackEvent, Team};
 
 #[derive(Component, Clone, Default)]

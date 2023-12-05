@@ -31,10 +31,10 @@ fn setup(mut commands: Commands, mut camera_zoom: Query<&mut Zoom, With<Camera>>
     let count_a = normal.sample(&mut rng) as usize;
     let count_b = normal.sample(&mut rng) as usize;
 
-    let (count_large, count_small) = if count_a > count_b {
-        (count_a, count_b)
-    } else {
-        (count_b, count_a)
+    let (count_large, count_small) = match count_a.cmp(&count_b) {
+        std::cmp::Ordering::Greater => (count_a, count_b),
+        std::cmp::Ordering::Equal => (count_a + 1, count_b),
+        std::cmp::Ordering::Less => (count_b, count_a),
     };
 
     info!("Player: {}, Enemy: {}", count_large, count_small);
