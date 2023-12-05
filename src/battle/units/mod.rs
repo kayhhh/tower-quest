@@ -59,8 +59,8 @@ pub enum UnitSprite {
 impl UnitSprite {
     pub fn sprite_size(&self) -> Vec2 {
         match self {
-            UnitSprite::Knight => Vec2::new(11.0, 8.0),
-            UnitSprite::Archer => Vec2::new(11.0, 8.0),
+            UnitSprite::Knight => Vec2::new(15.0, 8.0),
+            UnitSprite::Archer => Vec2::new(15.0, 8.0),
         }
     }
 }

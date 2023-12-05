@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_xpbd_2d::components::{Collider, LinearVelocity, RigidBody};
 
 use super::{animation::AttackEvent, Team};
 
@@ -61,10 +62,17 @@ pub fn set_target(
 }
 
 pub fn move_units(
-    time: Res<Time>,
-    mut units: Query<(&mut Transform, &Movement, &MovementSpeed), Without<Dead>>,
+    mut units: Query<
+        (
+            &mut Transform,
+            &mut LinearVelocity,
+            &Movement,
+            &MovementSpeed,
+        ),
+        Without<Dead>,
+    >,
 ) {
-    for (mut transform, movement, speed) in units.iter_mut() {
+    for (transform, mut velocity, movement, speed) in units.iter_mut() {
         match movement {
             Movement::WithinRange { target, range } => {
                 let distance = transform.translation.distance(*target);
@@ -76,9 +84,9 @@ pub fn move_units(
                 let direction = *target - transform.translation;
                 let direction = direction.normalize();
 
-                let translation = direction * speed.0 * time.delta_seconds();
-
-                transform.translation += translation;
+                let v = direction * speed.0;
+                velocity.x = v.x;
+                velocity.y = v.y;
             }
         }
     }
@@ -150,7 +158,9 @@ pub fn attack(
             commands
                 .entity(target.0)
                 .insert((Dead, Visibility::Hidden))
+                .remove::<Collider>()
                 .remove::<Movement>()
+                .remove::<RigidBody>()
                 .remove::<TextureAtlasSprite>();
         }
     }

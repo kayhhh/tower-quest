@@ -1,5 +1,9 @@
 use bevy::{core_pipeline::clear_color::ClearColorConfig, prelude::*};
 use bevy_round_ui::prelude::RoundUiPlugin;
+use bevy_xpbd_2d::{
+    plugins::{PhysicsDebugPlugin, PhysicsPlugins},
+    resources::Gravity,
+};
 use zoom::Zoom;
 
 mod battle;
@@ -10,11 +14,14 @@ pub fn start() {
     App::new()
         .add_plugins((
             DefaultPlugins.set(ImagePlugin::default_nearest()),
+            PhysicsPlugins::default(),
+            PhysicsDebugPlugin::default(),
             RoundUiPlugin,
             battle::BattlePlugin,
             menu::MenuPlugin,
             zoom::ZoomPlugin,
         ))
+        .insert_resource(Gravity(Vec2::ZERO))
         .add_state::<GameState>()
         .add_systems(Startup, setup)
         .run();
