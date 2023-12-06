@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use rand::Rng;
 
 use super::{formation::Formation, presets::UnitBundle, Team};
 
@@ -48,12 +49,17 @@ pub fn spawn_units(
     mut commands: Commands,
     mut squads: Query<(Entity, &Formation, &Team, &SquadCount, &UnitType), With<Squad>>,
 ) {
+    let mut rng = rand::thread_rng();
+
     for (ent, formation, team, count, unit) in squads.iter_mut() {
         let coords = formation.coords(count.0);
 
         for (mut x, mut y) in coords {
             x *= unit.spacing().x;
             y *= unit.spacing().y;
+
+            x += rng.gen_range(-1.0..=1.0);
+            y += rng.gen_range(-1.0..=1.0);
 
             let x = match team {
                 Team::Player => -x,
