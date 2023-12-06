@@ -1,15 +1,13 @@
-use bevy::{app::AppExit, prelude::*};
+use bevy::prelude::*;
 use bevy_round_ui::prelude::{RoundUiBorder, RoundUiMaterial, RoundUiOffset};
 
-use crate::GameState;
-
-use super::colors;
+use crate::menu::colors;
 
 #[derive(Component)]
-pub struct RoundButton;
+pub struct ItemCard;
 
 #[derive(Resource)]
-pub struct ButtonStyle {
+pub struct ItemCardStyle {
     pub width: f32,
     pub height: f32,
     pub default: Handle<RoundUiMaterial>,
@@ -17,7 +15,7 @@ pub struct ButtonStyle {
     pub press: Handle<RoundUiMaterial>,
 }
 
-impl FromWorld for ButtonStyle {
+impl FromWorld for ItemCardStyle {
     fn from_world(world: &mut World) -> Self {
         let cell = world.cell();
         let mut materials = cell
@@ -25,7 +23,7 @@ impl FromWorld for ButtonStyle {
             .expect("Failed to get Assets<RoundUiMaterial>");
 
         let width = 200.0;
-        let height = 40.0;
+        let height = 250.0;
         let offset = 5.0;
         let border_radius = RoundUiBorder::all(15.0);
 
@@ -60,9 +58,9 @@ impl FromWorld for ButtonStyle {
 pub fn handle_interactions(
     mut interaction_query: Query<
         (&Interaction, &mut Handle<RoundUiMaterial>),
-        (Changed<Interaction>, With<RoundButton>),
+        (Changed<Interaction>, With<ItemCard>),
     >,
-    button_style: Res<ButtonStyle>,
+    button_style: Res<ItemCardStyle>,
 ) {
     for (interaction, mut material) in &mut interaction_query {
         *material = match *interaction {
@@ -70,70 +68,5 @@ pub fn handle_interactions(
             Interaction::Hovered => button_style.hover.clone(),
             Interaction::None => button_style.default.clone(),
         };
-    }
-}
-
-#[derive(Component, Debug)]
-pub enum ButtonAction {
-    Start,
-    Quit,
-}
-
-#[derive(Component)]
-pub struct DeferredAction {
-    pub action: ButtonAction,
-    time: u128,
-}
-
-pub fn defer_actions(
-    mut commands: Commands,
-    time: Res<Time>,
-    interaction_query: Query<(&Interaction, &ButtonAction), Changed<Interaction>>,
-) {
-    for (interaction, action) in &interaction_query {
-        if *interaction == Interaction::Pressed {
-            info!("Button pressed: {:?}", action);
-
-            let time = time.elapsed().as_millis();
-
-            // Delay action so player can see the button press animation
-            // (this sucks but whatever)
-            match action {
-                ButtonAction::Start => commands.spawn(DeferredAction {
-                    action: ButtonAction::Start,
-                    time,
-                }),
-                ButtonAction::Quit => commands.spawn(DeferredAction {
-                    action: ButtonAction::Quit,
-                    time,
-                }),
-            };
-        }
-    }
-}
-
-pub fn handle_actions(
-    actions: Query<(&DeferredAction, Entity)>,
-    time: Res<Time>,
-    mut commands: Commands,
-    mut app_exit_events: EventWriter<AppExit>,
-    mut next_state: ResMut<NextState<GameState>>,
-) {
-    for (deferred, entity) in &mut actions.iter() {
-        let now = time.elapsed().as_millis();
-        let elapsed = now - deferred.time;
-
-        if elapsed < 80 {
-            continue;
-        }
-
-        match deferred.action {
-            ButtonAction::Start => next_state.set(GameState::Battle),
-            ButtonAction::Quit => app_exit_events.send(AppExit),
-        }
-
-        info!("Button action complete: {:?}", deferred.action);
-
-        commands.entity(entity).despawn();
     }
 }

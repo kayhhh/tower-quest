@@ -82,7 +82,7 @@ pub fn setup(
                     style: Style {
                         align_items: AlignItems::Center,
                         justify_content: JustifyContent::Center,
-                        bottom: Val::Px(40.0),
+                        bottom: Val::Px(button_style.height),
                         ..default()
                     },
                     ..default()
@@ -123,7 +123,7 @@ pub fn spawn_button(
                     justify_content: JustifyContent::Center,
                     width: Val::Px(button_style.width),
                     height: Val::Px(button_style.height),
-                    margin: UiRect::bottom(Val::Px(10.)),
+                    margin: UiRect::bottom(Val::Px(10.0)),
                     ..default()
                 },
                 ..default()
