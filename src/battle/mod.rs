@@ -41,11 +41,11 @@ impl Plugin for BattlePlugin {
 }
 
 pub const ARENA_HEIGHT: f32 = 200.0;
-pub const ARENA_WIDTH: f32 = 800.0;
+pub const ARENA_WIDTH: f32 = 600.0;
 pub const INITIAL_UNITS: usize = 10;
 pub const TEAM_GAP: f32 = 100.0;
 
-pub fn rand_unit_transform(team: Team) -> Transform {
+pub fn rand_unit_transform(team: &Team) -> Transform {
     let mut rng = rand::thread_rng();
 
     let x = rng.gen_range((TEAM_GAP / 2.0)..(ARENA_WIDTH / 2.0));
@@ -60,10 +60,10 @@ pub fn rand_unit_transform(team: Team) -> Transform {
 }
 
 fn create_initial_units(mut commands: Commands) {
-    let mut player_transform = rand_unit_transform(Team::Player);
+    let mut player_transform = rand_unit_transform(&Team::Player);
     player_transform.translation.x = -TEAM_GAP;
 
-    let mut enemy_transform = rand_unit_transform(Team::Enemy);
+    let mut enemy_transform = rand_unit_transform(&Team::Enemy);
     enemy_transform.translation.x = TEAM_GAP;
 
     commands.spawn(UnitSpawnBundle {

@@ -45,7 +45,7 @@ fn setup(mut commands: Commands) {
                 clear_color: ClearColorConfig::Custom(Color::hex(menu::colors::BG_DARK).unwrap()),
             },
             transform: Transform {
-                scale: Vec3::splat(0.75),
+                scale: Vec3::splat(0.5),
                 ..default()
             },
             ..default()

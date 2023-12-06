@@ -31,7 +31,7 @@ pub fn upgrade_enemy(mut commands: Commands, floor: Res<Floor>) {
             ..default()
         },
         transform: TransformBundle {
-            local: rand_unit_transform(Team::Enemy),
+            local: rand_unit_transform(&Team::Enemy),
             ..default()
         },
     });

@@ -1,6 +1,10 @@
 use bevy::prelude::*;
 use rand::Rng;
 
+use crate::battle::units::{presets::KnightBundle, spawn::UnitSpawn};
+
+use super::effects::ItemEffect;
+
 #[derive(Component, Clone, Default)]
 pub enum ItemRarity {
     #[default]
@@ -37,27 +41,37 @@ pub struct ItemDescription(pub String);
 pub struct ItemBundle {
     copies: ItemCopies,
     description: ItemDescription,
+    image: Handle<Image>,
     name: Name,
     rarity: ItemRarity,
-    image: Handle<Image>,
 }
 
 pub fn load_item_sprites(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.spawn(ItemBundle {
-        copies: ItemCopies(4),
-        description: ItemDescription("+25% movement speed".to_string()),
-        name: Name::new("Coffee"),
-        rarity: ItemRarity::Rare,
-        image: asset_server.load("images/items/Coffee.png"),
-    });
+    commands.spawn((
+        ItemBundle {
+            copies: ItemCopies(4),
+            description: ItemDescription("+25% movement speed".to_string()),
+            image: asset_server.load("images/items/Coffee.png"),
+            name: Name::new("Coffee"),
+            rarity: ItemRarity::Rare,
+        },
+        ItemEffect::MovementSpeed(0.25),
+    ));
 
-    commands.spawn(ItemBundle {
-        description: ItemDescription("+10 knights".to_string()),
-        name: Name::new("Knights"),
-        rarity: ItemRarity::Common,
-        image: asset_server.load("images/items/KnightItem.png"),
-        ..default()
-    });
+    commands.spawn((
+        ItemBundle {
+            description: ItemDescription("+10 knights".to_string()),
+            image: asset_server.load("images/items/KnightItem.png"),
+            name: Name::new("Knights"),
+            rarity: ItemRarity::Common,
+            ..default()
+        },
+        ItemEffect::SpawnKnights(UnitSpawn {
+            unit: KnightBundle::default(),
+            unit_count: 10,
+            ..default()
+        }),
+    ));
 }
 
 #[derive(Clone)]

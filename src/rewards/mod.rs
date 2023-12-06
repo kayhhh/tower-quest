@@ -8,10 +8,12 @@ use crate::{menu::colors, GameState};
 
 use self::{
     button::{ItemCard, ItemCardStyle, ItemSelect},
+    effects::SpeedModifier,
     items::{gen_item_choices, ItemChoice, ItemCopies, ItemDescription, ItemRarity},
 };
 
 mod button;
+pub mod effects;
 pub mod items;
 
 pub struct RewardsPlugin;
@@ -19,6 +21,7 @@ pub struct RewardsPlugin;
 impl Plugin for RewardsPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<ItemCardStyle>()
+            .insert_resource(SpeedModifier(1.0))
             .add_systems(Startup, items::load_item_sprites)
             .add_systems(
                 Update,

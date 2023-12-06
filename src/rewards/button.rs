@@ -1,9 +1,19 @@
 use bevy::prelude::*;
 use bevy_round_ui::prelude::{RoundUiBorder, RoundUiMaterial, RoundUiOffset};
 
-use crate::{menu::colors, GameState};
+use crate::{
+    battle::{
+        rand_unit_transform,
+        units::spawn::{UnitSpawn, UnitSpawnBundle},
+    },
+    menu::colors,
+    GameState,
+};
 
-use super::items::ItemCopies;
+use super::{
+    effects::{ItemEffect, SpeedModifier},
+    items::ItemCopies,
+};
 
 #[derive(Component)]
 pub struct ItemCard;
@@ -80,11 +90,12 @@ pub fn handle_item_select(
     mut commands: Commands,
     interaction_query: Query<(&Interaction, &ItemSelect), Changed<Interaction>>,
     mut next_state: ResMut<NextState<GameState>>,
-    mut items: Query<(&Name, &mut ItemCopies)>,
+    mut items: Query<(&Name, &mut ItemCopies, &ItemEffect)>,
+    mut speed_modified: ResMut<SpeedModifier>,
 ) {
     for (interaction, action) in &interaction_query {
         if *interaction == Interaction::Pressed {
-            let (name, mut copies) = match items.get_mut(action.0) {
+            let (name, mut copies, effect) = match items.get_mut(action.0) {
                 Ok(item) => item,
                 Err(_) => {
                     error!("Failed to get item");
@@ -96,7 +107,29 @@ pub fn handle_item_select(
 
             copies.0 -= 1;
 
+            match effect {
+                ItemEffect::MovementSpeed(multiplier) => {
+                    speed_modified.0 += multiplier;
+                }
+                ItemEffect::SpawnKnights(spawn) => {
+                    spawn_units(&mut commands, spawn.clone());
+                }
+                ItemEffect::SpawnArchers(spawn) => {
+                    spawn_units(&mut commands, spawn.clone());
+                }
+            };
+
             next_state.set(GameState::Battle);
         }
     }
+}
+
+fn spawn_units<T: Bundle + Default>(commands: &mut Commands, spawn: UnitSpawn<T>) {
+    commands.spawn(UnitSpawnBundle {
+        transform: TransformBundle {
+            local: rand_unit_transform(&spawn.team),
+            ..default()
+        },
+        spawn,
+    });
 }

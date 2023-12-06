@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use super::{Formation, Team, UnitSprite, UnitSprites};
 
-#[derive(Component, Default)]
+#[derive(Component, Clone, Default)]
 pub struct UnitSpawn<T: Bundle + Default> {
     pub unit: T,
     pub team: Team,

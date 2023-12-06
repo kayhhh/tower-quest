@@ -80,7 +80,7 @@ pub enum Team {
     Enemy,
 }
 
-#[derive(Default)]
+#[derive(Clone, Default)]
 pub enum Formation {
     Column,
     #[default]

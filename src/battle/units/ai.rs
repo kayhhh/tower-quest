@@ -1,6 +1,8 @@
 use bevy::prelude::*;
 use bevy_xpbd_2d::components::{Collider, LinearVelocity, RigidBody};
 
+use crate::rewards::effects::SpeedModifier;
+
 use super::{animation::AttackEvent, Team};
 
 #[derive(Component, Clone, Default)]
@@ -79,6 +81,7 @@ pub fn set_target(
 }
 
 pub fn move_units(
+    speed_modifier: Res<SpeedModifier>,
     mut units: Query<
         (
             &mut Transform,
@@ -107,9 +110,11 @@ pub fn move_units(
             }
         };
 
-        let v = direction * speed.0;
-        velocity.x = v.x;
-        velocity.y = v.y;
+        let speed = speed.0 * speed_modifier.0;
+        let vel = direction * speed;
+
+        velocity.x = vel.x;
+        velocity.y = vel.y;
     }
 }
 
