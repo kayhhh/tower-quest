@@ -7,7 +7,7 @@ use bevy_round_ui::{
 use crate::{menu::colors, GameState};
 
 use self::{
-    button::{ItemCard, ItemCardStyle},
+    button::{ItemCard, ItemCardStyle, ItemSelect},
     items::{gen_item_choices, ItemMetadata, Items},
 };
 
@@ -20,7 +20,10 @@ impl Plugin for RewardsPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<ItemCardStyle>()
             .add_systems(Startup, items::load_item_sprites)
-            .add_systems(Update, button::handle_interactions)
+            .add_systems(
+                Update,
+                (button::handle_interactions, button::handle_item_select),
+            )
             .add_systems(OnEnter(GameState::Victory), setup_rewards)
             .add_systems(OnExit(GameState::Victory), cleanup);
     }
@@ -125,6 +128,7 @@ pub fn spawn_item_card(
     parent
         .spawn((
             ItemCard,
+            ItemSelect(item.clone()),
             RoundUiAutosizeNode,
             RoundUiAutosizeNodePadding,
             MaterialNodeBundle {

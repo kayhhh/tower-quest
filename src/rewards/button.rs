@@ -1,7 +1,9 @@
 use bevy::prelude::*;
 use bevy_round_ui::prelude::{RoundUiBorder, RoundUiMaterial, RoundUiOffset};
 
-use crate::menu::colors;
+use crate::{menu::colors, GameState};
+
+use super::items::{ItemMetadata, Items};
 
 #[derive(Component)]
 pub struct ItemCard;
@@ -68,5 +70,22 @@ pub fn handle_interactions(
             Interaction::Hovered => button_style.hover.clone(),
             Interaction::None => button_style.default.clone(),
         };
+    }
+}
+
+#[derive(Component)]
+pub struct ItemSelect(pub ItemMetadata);
+
+pub fn handle_item_select(
+    interaction_query: Query<(&Interaction, &ItemSelect), Changed<Interaction>>,
+    mut items: ResMut<Items>,
+    mut next_state: ResMut<NextState<GameState>>,
+) {
+    for (interaction, action) in &interaction_query {
+        if *interaction == Interaction::Pressed {
+            info!("Item selected: {}", action.0.name);
+
+            next_state.set(GameState::Battle);
+        }
     }
 }

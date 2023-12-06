@@ -26,29 +26,35 @@ pub struct ItemMetadata {
     pub description: String,
     pub sprite: Handle<Image>,
     pub rarity: ItemRarity,
+    pub copies: usize,
+}
+
+#[derive(Clone)]
+pub enum Item {
+    Coffee(ItemMetadata),
+    Knights(ItemMetadata),
 }
 
 #[derive(Resource)]
-pub struct Items {
-    pub coffee: ItemMetadata,
-    pub knights: ItemMetadata,
-}
+pub struct Items(Vec<Item>);
 
 pub fn load_item_sprites(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.insert_resource(Items {
-        coffee: ItemMetadata {
+    commands.insert_resource(Items(vec![
+        Item::Coffee(ItemMetadata {
             name: "Coffee".to_string(),
             description: "+25% movement speed".to_string(),
             sprite: asset_server.load("sprites/Coffee.png"),
             rarity: ItemRarity::Rare,
-        },
-        knights: ItemMetadata {
+            copies: 4,
+        }),
+        Item::Knights(ItemMetadata {
             name: "Knights".to_string(),
             description: "+10 knights".to_string(),
             sprite: asset_server.load("sprites/KnightItem.png"),
             rarity: ItemRarity::Common,
-        },
-    });
+            copies: 8,
+        }),
+    ]));
 }
 
 /// Generate a random list of item choices
@@ -57,12 +63,19 @@ pub fn gen_item_choices(items: &Items) -> Vec<ItemMetadata> {
 
     let mut rng = rand::thread_rng();
 
-    let items = vec![&items.coffee, &items.knights];
-
     // Create a list of all items, weighted by rarity
     let mut weighted_items = vec![];
 
-    for item in items {
+    for item in &items.0 {
+        let item = match item {
+            Item::Coffee(item) => item,
+            Item::Knights(item) => item,
+        };
+
+        if item.copies == 0 {
+            continue;
+        }
+
         for _ in 0..item.rarity.weight() {
             weighted_items.push(item.clone());
         }
@@ -73,10 +86,8 @@ pub fn gen_item_choices(items: &Items) -> Vec<ItemMetadata> {
         .map(|_| rng.gen_range(0..weighted_items.len()))
         .collect::<Vec<_>>();
 
-    weighted_items
+    indices
         .iter()
-        .enumerate()
-        .filter(|(i, _)| indices.contains(i))
-        .map(|(_, item)| item.clone())
-        .collect()
+        .map(|&i| weighted_items[i].clone())
+        .collect::<Vec<_>>()
 }
