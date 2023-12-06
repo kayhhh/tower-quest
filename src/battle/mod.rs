@@ -7,7 +7,7 @@ use self::units::Team;
 pub mod camera;
 mod defeat;
 mod enemy;
-mod layout;
+pub mod layout;
 pub mod units;
 mod victory;
 

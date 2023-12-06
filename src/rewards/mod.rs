@@ -8,11 +8,12 @@ use crate::{menu::colors, GameState};
 
 use self::{
     button::{ItemCard, ItemCardStyle, ItemSelect},
+    choices::{ItemChoice, ItemChoices, NumItemChoices},
     effects::SpeedModifier,
-    items::{gen_item_choices, ItemChoice, ItemCopies, ItemDescription, ItemLevel, ItemRarity},
 };
 
 mod button;
+pub mod choices;
 pub mod effects;
 pub mod items;
 
@@ -21,13 +22,18 @@ pub struct RewardsPlugin;
 impl Plugin for RewardsPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<ItemCardStyle>()
+            .init_resource::<ItemChoices>()
             .insert_resource(SpeedModifier(1.0))
+            .insert_resource(NumItemChoices(3))
             .add_systems(Startup, items::init_items)
             .add_systems(
                 Update,
                 (button::handle_interactions, button::handle_item_select),
             )
-            .add_systems(OnEnter(GameState::Victory), setup_rewards)
+            .add_systems(
+                OnEnter(GameState::Victory),
+                (choices::set_item_choices, setup_rewards).chain(),
+            )
             .add_systems(OnExit(GameState::Victory), cleanup);
     }
 }
@@ -40,15 +46,7 @@ pub fn setup_rewards(
     button_style: Res<ItemCardStyle>,
     mut materials: ResMut<Assets<RoundUiMaterial>>,
     asset_server: Res<AssetServer>,
-    items: Query<(
-        Entity,
-        &Name,
-        &ItemCopies,
-        &ItemDescription,
-        &Handle<Image>,
-        &ItemRarity,
-        &ItemLevel,
-    )>,
+    choices: Res<ItemChoices>,
 ) {
     let font = asset_server.load("font/vt323.ttf");
 
@@ -61,23 +59,6 @@ pub fn setup_rewards(
         size: Vec2::new(panel_width, panel_height),
         ..default()
     });
-
-    let items = items
-        .iter()
-        .map(
-            |(ent, name, copies, description, image, rarity, level)| ItemChoice {
-                entity: ent,
-                name: name.to_string(),
-                description: description.0.clone(),
-                image: image.clone(),
-                copies: copies.0,
-                rarity: rarity.clone(),
-                level: level.clone(),
-            },
-        )
-        .collect::<Vec<_>>();
-
-    let choices = gen_item_choices(items);
 
     commands
         .spawn((
@@ -139,6 +120,7 @@ pub fn setup_rewards(
             })
             .with_children(|p| {
                 choices
+                    .0
                     .iter()
                     .for_each(|item| spawn_item_card(p, &button_style, font.clone(), item));
             });

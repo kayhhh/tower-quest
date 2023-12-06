@@ -19,8 +19,8 @@ pub enum UnitType {
 impl UnitType {
     pub fn spacing(&self) -> Vec2 {
         match self {
-            UnitType::Knight => Vec2::splat(12.0),
-            UnitType::Archer => Vec2::splat(12.0),
+            UnitType::Knight => Vec2::splat(10.0),
+            UnitType::Archer => Vec2::splat(10.0),
         }
     }
 

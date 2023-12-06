@@ -5,7 +5,7 @@ use crate::{menu::colors, GameState};
 
 use super::{
     effects::{ItemEffect, SpeedModifier},
-    items::{ItemCopies, ItemLevel},
+    items::{ItemLevel, ItemMaxCopies},
 };
 
 #[derive(Component)]
@@ -83,7 +83,7 @@ pub fn handle_item_select(
     mut commands: Commands,
     interaction_query: Query<(&Interaction, &ItemSelect), Changed<Interaction>>,
     mut next_state: ResMut<NextState<GameState>>,
-    mut items: Query<(&Name, &mut ItemCopies, &mut ItemLevel, &ItemEffect)>,
+    mut items: Query<(&Name, &mut ItemMaxCopies, &mut ItemLevel, &ItemEffect)>,
     mut speed_modified: ResMut<SpeedModifier>,
 ) {
     for (interaction, action) in &interaction_query {
