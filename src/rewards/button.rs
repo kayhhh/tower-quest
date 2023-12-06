@@ -77,6 +77,7 @@ pub fn handle_interactions(
 pub struct ItemSelect(pub Entity);
 
 pub fn handle_item_select(
+    mut commands: Commands,
     interaction_query: Query<(&Interaction, &ItemSelect), Changed<Interaction>>,
     mut next_state: ResMut<NextState<GameState>>,
     mut items: Query<(&Name, &mut ItemCopies)>,

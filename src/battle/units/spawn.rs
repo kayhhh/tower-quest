@@ -85,14 +85,14 @@ fn coords_box(count: usize) -> Vec<(f32, f32)> {
         square += 1;
     }
 
-    for _ in 0..count {
+    for i in 0..count {
         coords.push((x, y));
 
-        x += 1.0;
-
-        if x >= square as f32 {
+        if i % square == square - 1 {
             x = 0.0;
             y += 1.0;
+        } else {
+            x += 1.0;
         }
     }
 

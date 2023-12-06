@@ -18,6 +18,7 @@ pub fn start() {
             menu::MenuPlugin,
             rewards::RewardsPlugin,
         ))
+        .init_resource::<Floor>()
         .insert_resource(Gravity(Vec2::ZERO))
         .add_state::<GameState>()
         .add_systems(Startup, setup)
@@ -33,6 +34,9 @@ pub enum GameState {
     Reward,
     Defeat,
 }
+
+#[derive(Resource, Default)]
+pub struct Floor(pub usize);
 
 fn setup(mut commands: Commands) {
     commands.spawn((

@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::GameState;
+use crate::{Floor, GameState};
 
 use super::units::{ai::Dead, spawn::Unit, Team};
 
@@ -40,4 +40,8 @@ pub fn detect_victory(
     }
 
     *battle_started = false;
+}
+
+pub fn increase_floor(mut floor: ResMut<Floor>) {
+    floor.0 += 1;
 }
