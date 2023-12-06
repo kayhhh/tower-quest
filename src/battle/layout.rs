@@ -50,19 +50,21 @@ fn spawn_slots(commands: &mut Commands, team: &Team) {
                         local: Transform::from_xyz(x, y, 0.0),
                         ..default()
                     },
+                    VisibilityBundle::default(),
                 ))
                 .id();
 
             if column == 1 && row == units_row {
-                info!("Spawning {:?} units in row {}", team, row);
-
                 let squad = commands
-                    .spawn(SquadBundle {
-                        unit: UnitType::Knight,
-                        count: SquadCount(10),
-                        team: team.clone(),
-                        ..default()
-                    })
+                    .spawn((
+                        SquadBundle {
+                            unit: UnitType::Knight,
+                            count: SquadCount(10),
+                            team: team.clone(),
+                            ..default()
+                        },
+                        VisibilityBundle::default(),
+                    ))
                     .id();
 
                 commands.entity(slot).add_child(squad);

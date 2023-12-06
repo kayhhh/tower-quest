@@ -44,17 +44,26 @@ pub struct Dead;
 
 pub fn set_target(
     mut commands: Commands,
-    units: Query<(Entity, &MovementStyle, &Team, &Transform, &AttackRange), Without<Dead>>,
+    units: Query<
+        (
+            Entity,
+            &MovementStyle,
+            &Team,
+            &GlobalTransform,
+            &AttackRange,
+        ),
+        Without<Dead>,
+    >,
 ) {
     for (ent, style, team, transform, range) in units.iter() {
         let nearest_enemy = units
             .iter()
             .filter(|(_, _, t, _, _)| **t != *team)
-            .map(|(e, _, _, t, _)| (e, t, transform.translation.distance(t.translation)))
+            .map(|(e, _, _, t, _)| (e, t, transform.translation().distance(t.translation())))
             .min_by(|(_, _, d1), (_, _, d2)| d1.partial_cmp(d2).unwrap());
 
         let (target_ent, target_translation) = match nearest_enemy {
-            Some((e, t, _)) => (e, t.translation),
+            Some((e, t, _)) => (e, t.translation()),
             None => {
                 commands.entity(ent).remove::<AttackTarget>();
                 continue;
@@ -84,7 +93,7 @@ pub fn move_units(
     speed_modifier: Res<SpeedModifier>,
     mut units: Query<
         (
-            &mut Transform,
+            &mut GlobalTransform,
             &mut LinearVelocity,
             &Movement,
             &MovementSpeed,
@@ -95,17 +104,18 @@ pub fn move_units(
     for (transform, mut velocity, movement, speed) in units.iter_mut() {
         let direction = match movement {
             Movement::Direct { target } => {
-                let direction = *target - transform.translation;
+                let direction = *target - transform.translation();
                 direction.normalize()
             }
             Movement::WithinRange { target, range } => {
-                let distance = transform.translation.distance(*target);
+                let translation = transform.translation();
+                let distance = translation.distance(*target);
 
                 if distance <= *range {
                     continue;
                 }
 
-                let direction = *target - transform.translation;
+                let direction = *target - translation;
                 direction.normalize()
             }
         };

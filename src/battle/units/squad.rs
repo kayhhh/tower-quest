@@ -16,10 +16,10 @@ pub enum UnitType {
 }
 
 impl UnitType {
-    pub fn phys_size(&self) -> Vec2 {
+    pub fn spacing(&self) -> Vec2 {
         match self {
-            UnitType::Knight => Vec2::new(3.0, 3.0),
-            UnitType::Archer => Vec2::new(2.0, 2.0),
+            UnitType::Knight => Vec2::splat(12.0),
+            UnitType::Archer => Vec2::splat(12.0),
         }
     }
 
@@ -52,8 +52,13 @@ pub fn spawn_units(
         let coords = formation.coords(count.0);
 
         for (mut x, mut y) in coords {
-            x *= unit.phys_size().x;
-            y *= unit.phys_size().y;
+            x *= unit.spacing().x;
+            y *= unit.spacing().y;
+
+            let x = match team {
+                Team::Player => -x,
+                Team::Enemy => x,
+            };
 
             let unit_bundle = match unit {
                 UnitType::Knight => UnitBundle::knight(),
