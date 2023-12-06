@@ -59,11 +59,6 @@ pub fn set_camera_velocity(
         let bottom = frustum.half_spaces[2].d() + bounds.min.y;
         let top = frustum.half_spaces[3].d() - bounds.max.y;
 
-        // info!(
-        //     "left: {}, right: {}, bottom: {}, top: {}",
-        //     left, right, bottom, top
-        // );
-
         // If we have extra space on every side, zoom in
         // Otherwise, zoom out
         let min = left.min(right).min(bottom).min(top) - PADDING;

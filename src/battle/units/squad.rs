@@ -65,8 +65,6 @@ pub fn spawn_units(
                 UnitType::Archer => UnitBundle::archer(),
             };
 
-            info!("Spawning {:?} unit at ({}, {})", unit, x, y);
-
             commands
                 .spawn((
                     Unit,
