@@ -5,34 +5,69 @@ use rand_distr::Normal;
 use crate::Floor;
 
 use super::{
-    rand_formation, rand_unit_transform,
     units::{
-        presets::KnightBundle,
-        spawn::{UnitSpawn, UnitSpawnBundle},
-        Team,
+        formation::rand_formation,
+        squad::{SquadBundle, SquadCount, UnitType},
     },
     INITIAL_UNITS,
 };
 
+#[derive(Debug)]
+enum EnemyUpgrade {
+    IncreaseUnitCount,
+    AddSquad,
+}
+
+struct UpgradeOption {
+    weight: usize,
+    upgrade: EnemyUpgrade,
+}
+
 /// Upgrade enemy units for the next battle
 pub fn upgrade_enemy(mut commands: Commands, floor: Res<Floor>) {
-    let base = (INITIAL_UNITS as f32) * (1.0 + floor.0 as f32 / 10.0) - (INITIAL_UNITS / 2) as f32;
+    // Create upgrade options
+    let mut options = vec![UpgradeOption {
+        weight: 2,
+        upgrade: EnemyUpgrade::IncreaseUnitCount,
+    }];
+
+    // Create weighted pool of options
+    let mut pool = Vec::new();
+
+    for option in options.iter() {
+        for _ in 0..option.weight {
+            pool.push(&option.upgrade);
+        }
+    }
+
+    // Pick from pool
+    let mut rng = rand::thread_rng();
+
+    let upgrade = match pool.get(rng.gen_range(0..pool.len())) {
+        Some(upgrade) => *upgrade,
+        None => return,
+    };
+
+    info!("Enemy upgrade: {:?}", upgrade);
+
+    match upgrade {
+        EnemyUpgrade::IncreaseUnitCount => increase_unit_count(&mut commands, floor.0),
+        EnemyUpgrade::AddSquad => add_sqaud(&mut commands, floor.0),
+    }
+}
+
+fn increase_unit_count(commands: &mut Commands, floor: usize) {}
+
+fn add_sqaud(commands: &mut Commands, floor: usize) {
+    let base = (INITIAL_UNITS as f32) * (1.0 + floor as f32 / 10.0) - (INITIAL_UNITS / 2) as f32;
 
     let mut rng = rand::thread_rng();
     let normal = Normal::new(base, base / 3.0).unwrap();
 
-    commands.spawn(UnitSpawnBundle {
-        spawn: UnitSpawn {
-            formation: rand_formation(),
-            team: Team::Enemy,
-            unit: KnightBundle::default(),
-            unit_count: rng.sample(normal) as usize,
-            unit_size: Vec2::splat(10.0),
-            ..default()
-        },
-        transform: TransformBundle {
-            local: rand_unit_transform(&Team::Enemy),
-            ..default()
-        },
+    commands.spawn(SquadBundle {
+        unit: UnitType::Knight,
+        count: SquadCount(rng.sample(normal) as usize),
+        formation: rand_formation(),
+        ..default()
     });
 }

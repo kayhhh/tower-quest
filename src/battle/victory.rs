@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::{Floor, GameState};
 
-use super::units::{ai::Dead, spawn::Unit, Team};
+use super::units::{ai::Dead, squad::Unit, Team};
 
 pub fn detect_victory(
     mut battle_started: Local<bool>,

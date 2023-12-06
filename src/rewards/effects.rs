@@ -1,15 +1,11 @@
 use bevy::prelude::*;
 
-use crate::battle::units::{
-    presets::{ArcherBundle, KnightBundle},
-    spawn::UnitSpawn,
-};
+use crate::battle::units::squad::SquadBundle;
 
 #[derive(Component)]
 pub enum ItemEffect {
     AddMovementSpeed(f32),
-    SpawnArchers(UnitSpawn<ArcherBundle>),
-    SpawnKnights(UnitSpawn<KnightBundle>),
+    AddSquad(SquadBundle),
 }
 
 #[derive(Resource)]

@@ -1,14 +1,7 @@
 use bevy::prelude::*;
 use bevy_round_ui::prelude::{RoundUiBorder, RoundUiMaterial, RoundUiOffset};
 
-use crate::{
-    battle::{
-        rand_unit_transform,
-        units::spawn::{UnitSpawn, UnitSpawnBundle},
-    },
-    menu::colors,
-    GameState,
-};
+use crate::{menu::colors, GameState};
 
 use super::{
     effects::{ItemEffect, SpeedModifier},
@@ -116,25 +109,12 @@ pub fn handle_item_select(
                 ItemEffect::AddMovementSpeed(multiplier) => {
                     speed_modified.0 += multiplier;
                 }
-                ItemEffect::SpawnKnights(spawn) => {
-                    spawn_units(&mut commands, spawn.clone());
-                }
-                ItemEffect::SpawnArchers(spawn) => {
-                    spawn_units(&mut commands, spawn.clone());
+                ItemEffect::AddSquad(squad) => {
+                    commands.spawn(squad.clone());
                 }
             };
 
             next_state.set(GameState::Battle);
         }
     }
-}
-
-fn spawn_units<T: Bundle + Default>(commands: &mut Commands, spawn: UnitSpawn<T>) {
-    commands.spawn(UnitSpawnBundle {
-        transform: TransformBundle {
-            local: rand_unit_transform(&spawn.team),
-            ..default()
-        },
-        spawn,
-    });
 }

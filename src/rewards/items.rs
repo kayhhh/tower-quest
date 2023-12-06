@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use rand::Rng;
 
-use crate::battle::units::{presets::KnightBundle, spawn::UnitSpawn};
+use crate::battle::units::squad::{SquadBundle, SquadCount, UnitType};
 
 use super::effects::ItemEffect;
 
@@ -61,7 +61,7 @@ impl Default for ItemLevel {
 #[derive(Component, Default)]
 pub struct ItemDescription(pub String);
 
-#[derive(Bundle, Default)]
+#[derive(Bundle)]
 pub struct ItemBundle {
     copies: ItemCopies,
     description: ItemDescription,
@@ -69,35 +69,33 @@ pub struct ItemBundle {
     level: ItemLevel,
     name: Name,
     rarity: ItemRarity,
+    effect: ItemEffect,
 }
 
 pub fn init_items(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.spawn((
-        ItemBundle {
-            description: ItemDescription("+25% movement speed".to_string()),
-            image: asset_server.load("images/items/Coffee.png"),
-            level: ItemLevel::new(3),
-            name: Name::new("Coffee"),
-            rarity: ItemRarity::Rare,
-            ..default()
-        },
-        ItemEffect::AddMovementSpeed(0.25),
-    ));
+    commands.spawn(ItemBundle {
+        copies: ItemCopies(1),
+        description: ItemDescription("+25% movement speed".to_string()),
+        effect: ItemEffect::AddMovementSpeed(0.25),
+        image: asset_server.load("images/items/Coffee.png"),
+        level: ItemLevel::new(3),
+        name: Name::new("Coffee"),
+        rarity: ItemRarity::Rare,
+    });
 
-    commands.spawn((
-        ItemBundle {
-            copies: ItemCopies(6),
-            description: ItemDescription("+1 knight squad".to_string()),
-            image: asset_server.load("images/items/KnightItem.png"),
-            name: Name::new("Knight Squad"),
-            ..default()
-        },
-        ItemEffect::SpawnKnights(UnitSpawn {
-            unit: KnightBundle::default(),
-            unit_count: 10,
+    commands.spawn(ItemBundle {
+        copies: ItemCopies(6),
+        description: ItemDescription("+1 knight squad".to_string()),
+        effect: ItemEffect::AddSquad(SquadBundle {
+            unit: UnitType::Knight,
+            count: SquadCount(10),
             ..default()
         }),
-    ));
+        image: asset_server.load("images/items/KnightItem.png"),
+        name: Name::new("Knight Squad"),
+        level: ItemLevel::default(),
+        rarity: ItemRarity::Common,
+    });
 }
 
 #[derive(Clone)]

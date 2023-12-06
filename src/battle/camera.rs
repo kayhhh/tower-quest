@@ -1,6 +1,6 @@
 use bevy::{prelude::*, render::primitives::Frustum};
 
-use super::units::{ai::Dead, UnitSprite};
+use super::units::{ai::Dead, squad::Unit};
 
 #[derive(Component, Default)]
 pub struct TargetBounds {
@@ -13,7 +13,7 @@ pub struct TargetBounds {
 pub fn calc_bounds(
     mut commands: Commands,
     mut camera: Query<(Entity, &Transform), With<Camera>>,
-    mut units: Query<&Transform, (With<UnitSprite>, Without<Dead>)>,
+    mut units: Query<&Transform, (With<Unit>, Without<Dead>)>,
 ) {
     let camera = camera.single_mut();
 
