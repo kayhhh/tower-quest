@@ -26,7 +26,7 @@ struct UpgradeOption {
 /// Upgrade enemy units for the next battle
 pub fn upgrade_enemy(mut commands: Commands, floor: Res<Floor>) {
     // Create upgrade options
-    let mut options = vec![UpgradeOption {
+    let options = vec![UpgradeOption {
         weight: 2,
         upgrade: EnemyUpgrade::IncreaseUnitCount,
     }];
@@ -56,7 +56,7 @@ pub fn upgrade_enemy(mut commands: Commands, floor: Res<Floor>) {
     }
 }
 
-fn increase_unit_count(commands: &mut Commands, floor: usize) {}
+fn increase_unit_count(_commands: &mut Commands, _floor: usize) {}
 
 fn add_sqaud(commands: &mut Commands, floor: usize) {
     let base = (INITIAL_UNITS as f32) * (1.0 + floor as f32 / 10.0) - (INITIAL_UNITS / 2) as f32;
