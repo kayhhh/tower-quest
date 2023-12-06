@@ -1,6 +1,9 @@
 use bevy::prelude::*;
 
-use super::{squad::UnitType, Team};
+use super::{
+    squad::{Unit, UnitType},
+    Team,
+};
 
 #[derive(Default, Resource)]
 pub struct UnitSprites {
@@ -23,7 +26,10 @@ pub fn spawn_sprites(
     mut commands: Commands,
     sprites: Res<UnitSprites>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
-    mut units: Query<(Entity, &UnitType, &Team, &Transform), Without<TextureAtlasSprite>>,
+    mut units: Query<
+        (Entity, &UnitType, &Team, &Transform),
+        (With<Unit>, Without<TextureAtlasSprite>),
+    >,
 ) {
     for (ent, unit, team, transform) in units.iter_mut() {
         let atlas = match unit {

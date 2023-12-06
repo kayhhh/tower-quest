@@ -110,7 +110,7 @@ pub fn handle_item_select(
                     speed_modified.0 += multiplier;
                 }
                 ItemEffect::AddSquad(squad) => {
-                    commands.spawn(squad.clone());
+                    commands.spawn((VisibilityBundle::default(), squad.clone()));
                 }
             };
 

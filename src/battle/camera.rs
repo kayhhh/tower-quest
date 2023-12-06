@@ -12,8 +12,8 @@ pub struct TargetBounds {
 /// Keeps all units in view
 pub fn calc_bounds(
     mut commands: Commands,
-    mut camera: Query<(Entity, &Transform), With<Camera>>,
-    mut units: Query<&Transform, (With<Unit>, Without<Dead>)>,
+    mut camera: Query<(Entity, &GlobalTransform), With<Camera>>,
+    mut units: Query<&GlobalTransform, (With<Unit>, Without<Dead>)>,
 ) {
     let camera = camera.single_mut();
 
@@ -22,7 +22,7 @@ pub fn calc_bounds(
 
     for unit in units.iter_mut() {
         // Relative to camera
-        let pos = unit.translation.truncate() - camera.1.translation.truncate();
+        let pos = unit.translation().truncate() - camera.1.translation().truncate();
 
         min = min.min(pos);
         max = max.max(pos);
