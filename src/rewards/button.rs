@@ -100,8 +100,7 @@ pub fn handle_item_select(
 
             level.level += 1;
 
-            if level.level == level.max_level {
-                info!("Item maxed out: {}", name);
+            if level.level >= level.max_level {
                 copies.0 -= 1;
             }
 

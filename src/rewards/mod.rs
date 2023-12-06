@@ -153,7 +153,7 @@ pub fn spawn_item_card(
 ) {
     let item_name = match item.level.max_level {
         1 => item.name.clone(),
-        _ => format!("{} {}", item.name, to_roman(item.level.level)),
+        _ => format!("{} {}", item.name, to_roman(item.level.level + 1)),
     };
 
     parent

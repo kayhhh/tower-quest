@@ -52,7 +52,7 @@ impl ItemLevel {
 impl Default for ItemLevel {
     fn default() -> Self {
         Self {
-            level: 1,
+            level: 0,
             max_level: 1,
         }
     }
