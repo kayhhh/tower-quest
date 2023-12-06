@@ -15,7 +15,7 @@ pub struct BattlePlugin;
 impl Plugin for BattlePlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(units::UnitsPlugin)
-            .add_systems(Startup, layout::init_layouts)
+            .add_systems(Startup, layout::init_slots)
             .add_systems(
                 Update,
                 (

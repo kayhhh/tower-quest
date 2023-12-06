@@ -16,12 +16,13 @@ pub const COLUMNS: usize = 3;
 #[derive(Component)]
 pub struct SquadSlot;
 
-pub fn init_layouts(mut commands: Commands) {
-    spawn_layout(&mut commands, &Team::Player);
-    spawn_layout(&mut commands, &Team::Enemy);
+pub fn init_slots(mut commands: Commands) {
+    spawn_slots(&mut commands, &Team::Player);
+    spawn_slots(&mut commands, &Team::Enemy);
 }
 
-fn spawn_layout(commands: &mut Commands, team: &Team) {
+/// Each team has a grid of slots that units can be placed in.
+fn spawn_slots(commands: &mut Commands, team: &Team) {
     let mut rng = rand::thread_rng();
 
     // Which row to spawn units in
