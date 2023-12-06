@@ -26,7 +26,7 @@ impl Default for KnightBundle {
         Self {
             attack_speed: AttackCooldown(1.0),
             collider: Collider::ball(3.0),
-            damage: AttackDamage(10.0),
+            damage: AttackDamage(20.0),
             density: ColliderDensity(1.0),
             health: Health(100.0),
             locked: LockedAxes::ROTATION_LOCKED,

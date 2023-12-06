@@ -9,7 +9,7 @@ use crate::{menu::colors, GameState};
 use self::{
     button::{ItemCard, ItemCardStyle, ItemSelect},
     effects::SpeedModifier,
-    items::{gen_item_choices, ItemChoice, ItemCopies, ItemDescription, ItemRarity},
+    items::{gen_item_choices, ItemChoice, ItemCopies, ItemDescription, ItemLevel, ItemRarity},
 };
 
 mod button;
@@ -22,7 +22,7 @@ impl Plugin for RewardsPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<ItemCardStyle>()
             .insert_resource(SpeedModifier(1.0))
-            .add_systems(Startup, items::load_item_sprites)
+            .add_systems(Startup, items::init_items)
             .add_systems(
                 Update,
                 (button::handle_interactions, button::handle_item_select),
@@ -47,6 +47,7 @@ pub fn setup_rewards(
         &ItemDescription,
         &Handle<Image>,
         &ItemRarity,
+        &ItemLevel,
     )>,
 ) {
     let font = asset_server.load("font/vt323.ttf");
@@ -64,13 +65,14 @@ pub fn setup_rewards(
     let items = items
         .iter()
         .map(
-            |(ent, name, copies, description, image, rarity)| ItemChoice {
+            |(ent, name, copies, description, image, rarity, level)| ItemChoice {
                 entity: ent,
                 name: name.to_string(),
                 description: description.0.clone(),
                 image: image.clone(),
                 copies: copies.0,
                 rarity: rarity.clone(),
+                level: level.clone(),
             },
         )
         .collect::<Vec<_>>();
@@ -149,6 +151,11 @@ pub fn spawn_item_card(
     font: Handle<Font>,
     item: &ItemChoice,
 ) {
+    let item_name = match item.level.max_level {
+        1 => item.name.clone(),
+        _ => format!("{} {}", item.name, to_roman(item.level.level)),
+    };
+
     parent
         .spawn((
             ItemCard,
@@ -187,7 +194,7 @@ pub fn spawn_item_card(
             });
 
             p.spawn(TextBundle::from_section(
-                item.name.clone(),
+                item_name,
                 TextStyle {
                     color: Color::hex(colors::ACCENT).unwrap(),
                     font_size: 32.0,
@@ -210,4 +217,16 @@ pub fn cleanup(mut commands: Commands, query: Query<Entity, With<VictoryMenu>>) 
     for entity in query.iter() {
         commands.entity(entity).despawn_recursive();
     }
+}
+
+fn to_roman(num: usize) -> String {
+    match num {
+        1 => "I",
+        2 => "II",
+        3 => "III",
+        4 => "IV",
+        5 => "V",
+        _ => "",
+    }
+    .to_string()
 }

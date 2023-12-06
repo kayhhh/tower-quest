@@ -30,7 +30,31 @@ pub struct ItemCopies(pub usize);
 
 impl Default for ItemCopies {
     fn default() -> Self {
-        Self(8)
+        Self(1)
+    }
+}
+
+#[derive(Component, Clone)]
+pub struct ItemLevel {
+    pub level: usize,
+    pub max_level: usize,
+}
+
+impl ItemLevel {
+    pub fn new(max_level: usize) -> Self {
+        Self {
+            max_level,
+            ..default()
+        }
+    }
+}
+
+impl Default for ItemLevel {
+    fn default() -> Self {
+        Self {
+            level: 1,
+            max_level: 1,
+        }
     }
 }
 
@@ -42,28 +66,30 @@ pub struct ItemBundle {
     copies: ItemCopies,
     description: ItemDescription,
     image: Handle<Image>,
+    level: ItemLevel,
     name: Name,
     rarity: ItemRarity,
 }
 
-pub fn load_item_sprites(mut commands: Commands, asset_server: Res<AssetServer>) {
+pub fn init_items(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn((
         ItemBundle {
-            copies: ItemCopies(4),
             description: ItemDescription("+25% movement speed".to_string()),
             image: asset_server.load("images/items/Coffee.png"),
+            level: ItemLevel::new(3),
             name: Name::new("Coffee"),
             rarity: ItemRarity::Rare,
+            ..default()
         },
-        ItemEffect::MovementSpeed(0.25),
+        ItemEffect::AddMovementSpeed(0.25),
     ));
 
     commands.spawn((
         ItemBundle {
-            description: ItemDescription("+10 knights".to_string()),
+            copies: ItemCopies(6),
+            description: ItemDescription("+1 knight squad".to_string()),
             image: asset_server.load("images/items/KnightItem.png"),
-            name: Name::new("Knights"),
-            rarity: ItemRarity::Common,
+            name: Name::new("Knight Squad"),
             ..default()
         },
         ItemEffect::SpawnKnights(UnitSpawn {
@@ -82,6 +108,7 @@ pub struct ItemChoice {
     pub image: Handle<Image>,
     pub copies: usize,
     pub rarity: ItemRarity,
+    pub level: ItemLevel,
 }
 
 /// Generate a random list of item choices

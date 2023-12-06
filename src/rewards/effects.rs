@@ -7,7 +7,7 @@ use crate::battle::units::{
 
 #[derive(Component)]
 pub enum ItemEffect {
-    MovementSpeed(f32),
+    AddMovementSpeed(f32),
     SpawnArchers(UnitSpawn<ArcherBundle>),
     SpawnKnights(UnitSpawn<KnightBundle>),
 }

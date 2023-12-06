@@ -12,7 +12,7 @@ use crate::{
 
 use super::{
     effects::{ItemEffect, SpeedModifier},
-    items::ItemCopies,
+    items::{ItemCopies, ItemLevel},
 };
 
 #[derive(Component)]
@@ -90,12 +90,12 @@ pub fn handle_item_select(
     mut commands: Commands,
     interaction_query: Query<(&Interaction, &ItemSelect), Changed<Interaction>>,
     mut next_state: ResMut<NextState<GameState>>,
-    mut items: Query<(&Name, &mut ItemCopies, &ItemEffect)>,
+    mut items: Query<(&Name, &mut ItemCopies, &mut ItemLevel, &ItemEffect)>,
     mut speed_modified: ResMut<SpeedModifier>,
 ) {
     for (interaction, action) in &interaction_query {
         if *interaction == Interaction::Pressed {
-            let (name, mut copies, effect) = match items.get_mut(action.0) {
+            let (name, mut copies, mut level, effect) = match items.get_mut(action.0) {
                 Ok(item) => item,
                 Err(_) => {
                     error!("Failed to get item");
@@ -105,10 +105,15 @@ pub fn handle_item_select(
 
             info!("Item selected: {}", name);
 
-            copies.0 -= 1;
+            level.level += 1;
+
+            if level.level == level.max_level {
+                info!("Item maxed out: {}", name);
+                copies.0 -= 1;
+            }
 
             match effect {
-                ItemEffect::MovementSpeed(multiplier) => {
+                ItemEffect::AddMovementSpeed(multiplier) => {
                     speed_modified.0 += multiplier;
                 }
                 ItemEffect::SpawnKnights(spawn) => {
