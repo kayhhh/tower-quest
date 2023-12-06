@@ -1,8 +1,9 @@
 use bevy::prelude::*;
 use rand::Rng;
 
-#[derive(Clone)]
+#[derive(Component, Clone, Default)]
 pub enum ItemRarity {
+    #[default]
     Common,
     Rare,
     Epic,
@@ -20,45 +21,57 @@ impl ItemRarity {
     }
 }
 
-#[derive(Clone)]
-pub struct ItemMetadata {
-    pub name: String,
-    pub description: String,
-    pub sprite: Handle<Image>,
-    pub rarity: ItemRarity,
-    pub copies: usize,
+#[derive(Component)]
+pub struct ItemCopies(pub usize);
+
+impl Default for ItemCopies {
+    fn default() -> Self {
+        Self(8)
+    }
 }
 
-#[derive(Clone)]
-pub enum Item {
-    Coffee(ItemMetadata),
-    Knights(ItemMetadata),
-}
+#[derive(Component, Default)]
+pub struct ItemDescription(pub String);
 
-#[derive(Resource)]
-pub struct Items(Vec<Item>);
+#[derive(Bundle, Default)]
+pub struct ItemBundle {
+    copies: ItemCopies,
+    description: ItemDescription,
+    name: Name,
+    rarity: ItemRarity,
+    image: Handle<Image>,
+}
 
 pub fn load_item_sprites(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.insert_resource(Items(vec![
-        Item::Coffee(ItemMetadata {
-            name: "Coffee".to_string(),
-            description: "+25% movement speed".to_string(),
-            sprite: asset_server.load("sprites/Coffee.png"),
-            rarity: ItemRarity::Rare,
-            copies: 4,
-        }),
-        Item::Knights(ItemMetadata {
-            name: "Knights".to_string(),
-            description: "+10 knights".to_string(),
-            sprite: asset_server.load("sprites/KnightItem.png"),
-            rarity: ItemRarity::Common,
-            copies: 8,
-        }),
-    ]));
+    commands.spawn(ItemBundle {
+        copies: ItemCopies(4),
+        description: ItemDescription("+25% movement speed".to_string()),
+        name: Name::new("Coffee"),
+        rarity: ItemRarity::Rare,
+        image: asset_server.load("sprites/Coffee.png"),
+    });
+
+    commands.spawn(ItemBundle {
+        description: ItemDescription("+10 knights".to_string()),
+        name: Name::new("Knights"),
+        rarity: ItemRarity::Common,
+        image: asset_server.load("sprites/KnightItem.png"),
+        ..default()
+    });
+}
+
+#[derive(Clone)]
+pub struct ItemChoice {
+    pub entity: Entity,
+    pub name: String,
+    pub description: String,
+    pub image: Handle<Image>,
+    pub copies: usize,
+    pub rarity: ItemRarity,
 }
 
 /// Generate a random list of item choices
-pub fn gen_item_choices(items: &Items) -> Vec<ItemMetadata> {
+pub fn gen_item_choices(items: Vec<ItemChoice>) -> Vec<ItemChoice> {
     let num_choices = 3;
 
     let mut rng = rand::thread_rng();
@@ -66,18 +79,13 @@ pub fn gen_item_choices(items: &Items) -> Vec<ItemMetadata> {
     // Create a list of all items, weighted by rarity
     let mut weighted_items = vec![];
 
-    for item in &items.0 {
-        let item = match item {
-            Item::Coffee(item) => item,
-            Item::Knights(item) => item,
-        };
-
+    for item in &items {
         if item.copies == 0 {
             continue;
         }
 
         for _ in 0..item.rarity.weight() {
-            weighted_items.push(item.clone());
+            weighted_items.push(item);
         }
     }
 

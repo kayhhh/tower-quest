@@ -3,7 +3,7 @@ use bevy_round_ui::prelude::{RoundUiBorder, RoundUiMaterial, RoundUiOffset};
 
 use crate::{menu::colors, GameState};
 
-use super::items::{ItemMetadata, Items};
+use super::items::ItemCopies;
 
 #[derive(Component)]
 pub struct ItemCard;
@@ -74,16 +74,26 @@ pub fn handle_interactions(
 }
 
 #[derive(Component)]
-pub struct ItemSelect(pub ItemMetadata);
+pub struct ItemSelect(pub Entity);
 
 pub fn handle_item_select(
     interaction_query: Query<(&Interaction, &ItemSelect), Changed<Interaction>>,
-    mut items: ResMut<Items>,
     mut next_state: ResMut<NextState<GameState>>,
+    mut items: Query<(&Name, &mut ItemCopies)>,
 ) {
     for (interaction, action) in &interaction_query {
         if *interaction == Interaction::Pressed {
-            info!("Item selected: {}", action.0.name);
+            let (name, mut copies) = match items.get_mut(action.0) {
+                Ok(item) => item,
+                Err(_) => {
+                    error!("Failed to get item");
+                    continue;
+                }
+            };
+
+            info!("Item selected: {}", name);
+
+            copies.0 -= 1;
 
             next_state.set(GameState::Battle);
         }

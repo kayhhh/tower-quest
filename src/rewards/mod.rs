@@ -8,7 +8,7 @@ use crate::{menu::colors, GameState};
 
 use self::{
     button::{ItemCard, ItemCardStyle, ItemSelect},
-    items::{gen_item_choices, ItemMetadata, Items},
+    items::{gen_item_choices, ItemChoice, ItemCopies, ItemDescription, ItemRarity},
 };
 
 mod button;
@@ -37,7 +37,14 @@ pub fn setup_rewards(
     button_style: Res<ItemCardStyle>,
     mut materials: ResMut<Assets<RoundUiMaterial>>,
     asset_server: Res<AssetServer>,
-    items: Res<Items>,
+    items: Query<(
+        Entity,
+        &Name,
+        &ItemCopies,
+        &ItemDescription,
+        &Handle<Image>,
+        &ItemRarity,
+    )>,
 ) {
     let font = asset_server.load("font/vt323.ttf");
 
@@ -51,7 +58,21 @@ pub fn setup_rewards(
         ..default()
     });
 
-    let items = gen_item_choices(&items);
+    let items = items
+        .iter()
+        .map(
+            |(ent, name, copies, description, image, rarity)| ItemChoice {
+                entity: ent,
+                name: name.to_string(),
+                description: description.0.clone(),
+                image: image.clone(),
+                copies: copies.0,
+                rarity: rarity.clone(),
+            },
+        )
+        .collect::<Vec<_>>();
+
+    let choices = gen_item_choices(items);
 
     commands
         .spawn((
@@ -112,7 +133,7 @@ pub fn setup_rewards(
                 ..default()
             })
             .with_children(|p| {
-                items
+                choices
                     .iter()
                     .for_each(|item| spawn_item_card(p, &button_style, font.clone(), item));
             });
@@ -123,12 +144,12 @@ pub fn spawn_item_card(
     parent: &mut ChildBuilder,
     button_style: &Res<ItemCardStyle>,
     font: Handle<Font>,
-    item: &ItemMetadata,
+    item: &ItemChoice,
 ) {
     parent
         .spawn((
             ItemCard,
-            ItemSelect(item.clone()),
+            ItemSelect(item.entity),
             RoundUiAutosizeNode,
             RoundUiAutosizeNodePadding,
             MaterialNodeBundle {
@@ -156,7 +177,7 @@ pub fn spawn_item_card(
             })
             .with_children(|p| {
                 p.spawn(ImageBundle {
-                    image: UiImage::new(item.sprite.clone()),
+                    image: UiImage::new(item.image.clone()),
                     transform: Transform::from_scale(Vec3::splat(6.0)),
                     ..default()
                 });
