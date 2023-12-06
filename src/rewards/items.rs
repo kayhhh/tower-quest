@@ -48,14 +48,14 @@ pub fn load_item_sprites(mut commands: Commands, asset_server: Res<AssetServer>)
         description: ItemDescription("+25% movement speed".to_string()),
         name: Name::new("Coffee"),
         rarity: ItemRarity::Rare,
-        image: asset_server.load("sprites/Coffee.png"),
+        image: asset_server.load("images/items/Coffee.png"),
     });
 
     commands.spawn(ItemBundle {
         description: ItemDescription("+10 knights".to_string()),
         name: Name::new("Knights"),
         rarity: ItemRarity::Common,
-        image: asset_server.load("sprites/KnightItem.png"),
+        image: asset_server.load("images/items/KnightItem.png"),
         ..default()
     });
 }

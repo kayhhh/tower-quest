@@ -50,10 +50,10 @@ pub struct UnitSprites {
 
 fn load_sprites(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.insert_resource(UnitSprites {
-        archer_enemy: asset_server.load("sprites/ArcherEnemy.png"),
-        archer_friendly: asset_server.load("sprites/ArcherFriendly.png"),
-        knight_enemy: asset_server.load("sprites/KnightEnemy.png"),
-        knight_friendly: asset_server.load("sprites/KnightFriendly.png"),
+        archer_enemy: asset_server.load("images/units/ArcherEnemy.png"),
+        archer_friendly: asset_server.load("images/units/ArcherFriendly.png"),
+        knight_enemy: asset_server.load("images/units/KnightEnemy.png"),
+        knight_friendly: asset_server.load("images/units/KnightFriendly.png"),
     });
 }
 
