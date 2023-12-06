@@ -5,6 +5,7 @@ use crate::GameState;
 use self::units::Team;
 
 pub mod camera;
+mod defeat;
 mod enemy;
 mod layout;
 pub mod units;
@@ -32,7 +33,9 @@ impl Plugin for BattlePlugin {
             .add_systems(
                 OnExit(GameState::Victory),
                 (victory::increase_floor, enemy::upgrade_enemy).chain(),
-            );
+            )
+            .add_systems(OnEnter(GameState::Defeat), defeat::spawn_menu)
+            .add_systems(OnExit(GameState::Defeat), defeat::cleanup_menu);
     }
 }
 

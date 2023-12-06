@@ -11,6 +11,7 @@ pub fn detect_victory(
 ) {
     if !*battle_started {
         if units.iter().count() > 0 {
+            info!("Battle started!");
             *battle_started = true;
         }
 
@@ -36,6 +37,9 @@ pub fn detect_victory(
         next_state.set(GameState::Victory);
     } else if !enemy_alive {
         info!("Enemy wins!");
+        next_state.set(GameState::Defeat);
+    } else {
+        info!("Draw!");
         next_state.set(GameState::Defeat);
     }
 
