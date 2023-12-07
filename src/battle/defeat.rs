@@ -63,6 +63,7 @@ pub fn spawn_menu(
                     style: Style {
                         align_items: AlignItems::Center,
                         justify_content: JustifyContent::Center,
+                        flex_direction: FlexDirection::Column,
                         bottom: Val::Px(button_style.height),
                         ..default()
                     },

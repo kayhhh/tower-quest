@@ -1,7 +1,15 @@
 use bevy::prelude::*;
 use bevy_round_ui::prelude::{RoundUiBorder, RoundUiMaterial, RoundUiOffset};
+use rand::Rng;
 
-use crate::{menu::colors, GameState};
+use crate::{
+    battle::{
+        layout::SquadSlot,
+        units::{squad::Squad, Team},
+    },
+    menu::colors,
+    GameState,
+};
 
 use super::{
     effects::{ItemEffect, SpeedModifier},
@@ -85,6 +93,7 @@ pub fn handle_item_select(
     mut next_state: ResMut<NextState<GameState>>,
     mut items: Query<(&Name, &mut ItemMaxCopies, &mut ItemLevel, &ItemEffect)>,
     mut speed_modified: ResMut<SpeedModifier>,
+    open_slots: Query<(Entity, &Team), (With<SquadSlot>, Without<Squad>)>,
 ) {
     for (interaction, action) in &interaction_query {
         if *interaction == Interaction::Pressed {
@@ -109,7 +118,23 @@ pub fn handle_item_select(
                     speed_modified.0 += multiplier;
                 }
                 ItemEffect::AddSquad(squad) => {
-                    commands.spawn((VisibilityBundle::default(), squad.clone()));
+                    let open_slots = open_slots
+                        .iter()
+                        .filter(|(_, team)| **team == Team::Player)
+                        .map(|(ent, _)| ent)
+                        .collect::<Vec<_>>();
+
+                    let count = open_slots.len();
+
+                    if count == 0 {
+                        error!("No open slots");
+                        continue;
+                    }
+
+                    let mut rng = rand::thread_rng();
+                    let slot = open_slots[rng.gen_range(0..count)];
+
+                    commands.entity(slot).insert(squad.clone());
                 }
             };
 

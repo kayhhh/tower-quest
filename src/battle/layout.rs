@@ -3,7 +3,7 @@ use rand::Rng;
 
 use crate::battle::units::squad::{SquadBundle, SquadCount, UnitType};
 
-use super::Team;
+use super::{Team, INITIAL_UNITS};
 
 pub const ARENA_WIDTH: f32 = 600.0;
 pub const ARENA_HEIGHT: f32 = 200.0;
@@ -55,11 +55,16 @@ fn spawn_slots(commands: &mut Commands, team: &Team) {
                 .id();
 
             if column == 1 && row == units_row {
+                let num_units = match team {
+                    Team::Player => INITIAL_UNITS,
+                    Team::Enemy => INITIAL_UNITS / 2,
+                };
+
                 let squad = commands
                     .spawn((
                         SquadBundle {
                             unit: UnitType::Knight,
-                            count: SquadCount(10),
+                            count: SquadCount(num_units),
                             team: team.clone(),
                             ..default()
                         },
