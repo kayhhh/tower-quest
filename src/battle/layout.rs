@@ -60,19 +60,11 @@ fn spawn_slots(commands: &mut Commands, team: &Team) {
                     Team::Enemy => INITIAL_UNITS / 2,
                 };
 
-                let squad = commands
-                    .spawn((
-                        SquadBundle {
-                            unit: UnitType::Knight,
-                            count: SquadCount(num_units),
-                            team: team.clone(),
-                            ..default()
-                        },
-                        VisibilityBundle::default(),
-                    ))
-                    .id();
-
-                commands.entity(slot).add_child(squad);
+                let squad = commands.entity(slot).insert(SquadBundle {
+                    unit: UnitType::Knight,
+                    count: SquadCount(num_units),
+                    ..default()
+                });
             }
         }
     }

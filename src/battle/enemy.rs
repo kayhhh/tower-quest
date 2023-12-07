@@ -106,9 +106,9 @@ fn increase_unit_count(
 
 fn add_sqaud(commands: &mut Commands, floor: usize, slot: &Entity) {
     commands.entity(*slot).insert(SquadBundle {
-        unit: UnitType::Knight,
         count: SquadCount(rand_unit_count(floor)),
         formation: rand_formation(),
+        unit: UnitType::Knight,
         ..default()
     });
 }
