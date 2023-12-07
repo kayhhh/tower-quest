@@ -49,7 +49,7 @@ fn coords_box(count: usize) -> Vec<(f32, f32)> {
     let mut x = 0.0;
     let mut y = 0.0;
 
-    // Find closest square, greater than or equal to unit_count
+    // Find closest square, greater than or equal to count
     let mut square = 1;
     while square * square < count {
         square += 1;

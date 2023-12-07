@@ -44,8 +44,8 @@ fn spawn_slots(commands: &mut Commands, team: &Team) {
 
             let slot = commands
                 .spawn((
+                    team.clone(),
                     SquadSlot,
-                    Team::Player,
                     TransformBundle {
                         local: Transform::from_xyz(x, y, 0.0),
                         ..default()
@@ -75,5 +75,56 @@ fn spawn_slots(commands: &mut Commands, team: &Team) {
                 commands.entity(slot).add_child(squad);
             }
         }
+    }
+}
+
+#[derive(Resource)]
+pub struct RallyFlagSprites {
+    friendly: Handle<Image>,
+    enemy: Handle<Image>,
+}
+
+pub fn load_flag_images(mut commands: Commands, asset_server: Res<AssetServer>) {
+    commands.insert_resource(RallyFlagSprites {
+        friendly: asset_server.load("images/units/RallyFriendly.png"),
+        enemy: asset_server.load("images/units/RallyEnemy.png"),
+    });
+}
+
+#[derive(Component, Default)]
+pub struct RallyFlag {
+    pub spawned: bool,
+}
+
+pub fn add_flags(
+    mut commands: Commands,
+    slots: Query<Entity, (With<SquadSlot>, Without<RallyFlag>)>,
+) {
+    for ent in slots.iter() {
+        commands.entity(ent).insert(RallyFlag::default());
+    }
+}
+
+pub fn spawn_flag_sprites(
+    mut commands: Commands,
+    images: Res<RallyFlagSprites>,
+    mut flags: Query<(Entity, &Team, &mut RallyFlag)>,
+) {
+    for (ent, team, mut flag) in flags.iter_mut() {
+        if flag.spawned {
+            continue;
+        }
+
+        commands
+            .spawn(SpriteBundle {
+                texture: match team {
+                    Team::Player => images.friendly.clone(),
+                    Team::Enemy => images.enemy.clone(),
+                },
+                ..default()
+            })
+            .set_parent(ent);
+
+        flag.spawned = true;
     }
 }

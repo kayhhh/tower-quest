@@ -47,12 +47,25 @@ pub struct SquadBundle {
 
 pub fn spawn_units(
     mut commands: Commands,
-    mut squads: Query<(Entity, &Formation, &Team, &SquadCount, &UnitType), With<Squad>>,
+    mut squads: Query<
+        (
+            Entity,
+            &GlobalTransform,
+            &Formation,
+            &Team,
+            &SquadCount,
+            &UnitType,
+        ),
+        With<Squad>,
+    >,
 ) {
     let mut rng = rand::thread_rng();
 
-    for (ent, formation, team, count, unit) in squads.iter_mut() {
+    for (ent, transform, formation, team, count, unit) in squads.iter_mut() {
         let coords = formation.coords(count.0);
+
+        // let translation = transform.translation();
+        // println!("spawning at translation: {:?}", translation);
 
         for (mut x, mut y) in coords {
             x *= unit.spacing().x;
@@ -60,6 +73,9 @@ pub fn spawn_units(
 
             x += rng.gen_range(-1.0..=1.0);
             y += rng.gen_range(-1.0..=1.0);
+
+            // x += translation.x;
+            // y += translation.y;
 
             let x = match team {
                 Team::Player => -x,
