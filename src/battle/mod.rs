@@ -16,7 +16,7 @@ pub struct BattlePlugin;
 impl Plugin for BattlePlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(units::UnitsPlugin)
-            .add_systems(Startup, (layout::init_slots, layout::load_flag_images))
+            .add_systems(Startup, (layout::init_slots, layout::load_marker_images))
             .add_systems(
                 Update,
                 (
@@ -26,8 +26,8 @@ impl Plugin for BattlePlugin {
                         camera::apply_camera_velocity,
                     )
                         .chain(),
-                    layout::add_flags,
-                    layout::spawn_flag_sprites,
+                    layout::add_markers,
+                    layout::spawn_marker_sprites,
                     victory::detect_victory,
                 )
                     .run_if(in_state(GameState::Battle)),

@@ -3,7 +3,7 @@ use rand::Rng;
 
 use crate::battle::units::squad::{SquadBundle, SquadCount, UnitType};
 
-use super::{Team, INITIAL_UNITS};
+use super::{units::squad::Squad, Team, INITIAL_UNITS};
 
 pub const ARENA_WIDTH: f32 = 600.0;
 pub const ARENA_HEIGHT: f32 = 200.0;
@@ -60,7 +60,7 @@ fn spawn_slots(commands: &mut Commands, team: &Team) {
                     Team::Enemy => INITIAL_UNITS / 2,
                 };
 
-                let _squad = commands.entity(slot).insert(SquadBundle {
+                commands.entity(slot).insert(SquadBundle {
                     unit: UnitType::Knight,
                     count: SquadCount(num_units),
                     ..default()
@@ -71,52 +71,57 @@ fn spawn_slots(commands: &mut Commands, team: &Team) {
 }
 
 #[derive(Resource)]
-pub struct RallyFlagSprites {
-    friendly: Handle<Image>,
-    enemy: Handle<Image>,
+pub struct MarkerImages {
+    friendly_flag: Handle<Image>,
+    enemy_flag: Handle<Image>,
+    x: Handle<Image>,
 }
 
-pub fn load_flag_images(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.insert_resource(RallyFlagSprites {
-        friendly: asset_server.load("images/units/RallyFriendly.png"),
-        enemy: asset_server.load("images/units/RallyEnemy.png"),
+pub fn load_marker_images(mut commands: Commands, asset_server: Res<AssetServer>) {
+    commands.insert_resource(MarkerImages {
+        friendly_flag: asset_server.load("images/arena/RallyFriendly.png"),
+        enemy_flag: asset_server.load("images/arena/RallyEnemy.png"),
+        x: asset_server.load("images/arena/x.png"),
     });
 }
 
 #[derive(Component, Default)]
-pub struct RallyFlag {
+pub struct RallyMarkers {
     pub spawned: bool,
+    pub has_squad: bool,
 }
 
-pub fn add_flags(
+pub fn add_markers(
     mut commands: Commands,
-    slots: Query<Entity, (With<SquadSlot>, Without<RallyFlag>)>,
+    slots: Query<Entity, (With<SquadSlot>, Without<RallyMarkers>)>,
 ) {
     for ent in slots.iter() {
-        commands.entity(ent).insert(RallyFlag::default());
+        commands.entity(ent).insert(RallyMarkers::default());
     }
 }
 
-pub fn spawn_flag_sprites(
+pub fn spawn_marker_sprites(
     mut commands: Commands,
-    images: Res<RallyFlagSprites>,
-    mut flags: Query<(Entity, &Team, &mut RallyFlag)>,
+    images: Res<MarkerImages>,
+    mut flags: Query<(Entity, &Team, &mut RallyMarkers, Option<&Squad>)>,
 ) {
-    for (ent, team, mut flag) in flags.iter_mut() {
-        if flag.spawned {
+    for (ent, team, mut flag, squad) in flags.iter_mut() {
+        let has_squad = squad.is_some();
+
+        if flag.spawned && flag.has_squad == has_squad {
             continue;
         }
 
-        commands
-            .spawn(SpriteBundle {
-                texture: match team {
-                    Team::Player => images.friendly.clone(),
-                    Team::Enemy => images.enemy.clone(),
-                },
-                ..default()
-            })
-            .set_parent(ent);
+        flag.has_squad = has_squad;
 
-        flag.spawned = true;
+        let image = match squad {
+            Some(_) => match team {
+                Team::Player => images.friendly_flag.clone(),
+                Team::Enemy => images.enemy_flag.clone(),
+            },
+            None => images.x.clone(),
+        };
+
+        commands.entity(ent).insert((Sprite::default(), image));
     }
 }
