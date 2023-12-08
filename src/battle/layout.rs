@@ -5,13 +5,36 @@ use crate::battle::units::squad::{SquadBundle, SquadCount, UnitType};
 
 use super::{units::squad::Squad, Team, INITIAL_UNITS};
 
-pub const ARENA_WIDTH: f32 = 600.0;
-pub const ARENA_HEIGHT: f32 = 200.0;
+pub const ARENA_WIDTH: f32 = 500.0;
+pub const ARENA_HEIGHT: f32 = 300.0;
 /// Gap between the two territories
-const TEAM_GAP: f32 = 100.0;
+const TEAM_GAP: f32 = 75.0;
 
-pub const ROWS: usize = 3;
-pub const COLUMNS: usize = 3;
+pub const MAX_ROWS: usize = 5;
+pub const MAX_COLUMNS: usize = 3;
+
+const INITIAL_ROWS: usize = 3;
+const INITIAL_COLUMNS: usize = 1;
+
+pub struct UnlockedSlots {
+    pub rows: usize,
+    pub columns: usize,
+}
+
+impl Default for UnlockedSlots {
+    fn default() -> Self {
+        Self {
+            rows: INITIAL_ROWS,
+            columns: INITIAL_COLUMNS,
+        }
+    }
+}
+
+#[derive(Resource, Default)]
+pub struct FriendlyUnlockedSlots(UnlockedSlots);
+
+#[derive(Resource, Default)]
+pub struct EnemyUnlockedSlots(UnlockedSlots);
 
 #[derive(Component)]
 pub struct SquadSlot;
@@ -26,13 +49,14 @@ fn spawn_slots(commands: &mut Commands, team: &Team) {
     let mut rng = rand::thread_rng();
 
     // Which row to spawn units in
-    let units_row = rng.gen_range(1..=ROWS);
+    let units_row = rng.gen_range(1..=INITIAL_ROWS);
+    let units_column = rng.gen_range(1..=INITIAL_COLUMNS);
 
-    for row in 1..=ROWS {
-        for column in 1..=COLUMNS {
+    for row in 1..=MAX_ROWS {
+        for column in 1..=MAX_COLUMNS {
             let territory_width = (ARENA_WIDTH / 2.0) - (TEAM_GAP / 2.0);
-            let column_width = territory_width / COLUMNS as f32;
-            let row_height = ARENA_HEIGHT / ROWS as f32;
+            let column_width = territory_width / MAX_COLUMNS as f32;
+            let row_height = ARENA_HEIGHT / MAX_ROWS as f32;
 
             let x = column_width * column as f32 + column_width / 2.0;
             let y = row_height * row as f32 + row_height / 2.0 - ARENA_HEIGHT / 2.0;
@@ -54,7 +78,7 @@ fn spawn_slots(commands: &mut Commands, team: &Team) {
                 ))
                 .id();
 
-            if column == 1 && row == units_row {
+            if row == units_row && column == units_column {
                 let num_units = match team {
                     Team::Player => INITIAL_UNITS,
                     Team::Enemy => INITIAL_UNITS / 2,

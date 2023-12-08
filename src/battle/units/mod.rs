@@ -16,7 +16,10 @@ impl Plugin for UnitsPlugin {
         app.init_resource::<sprites::UnitSprites>()
             .add_event::<animation::AttackEvent>()
             .add_systems(Startup, sprites::load_sprites)
-            .add_systems(OnEnter(GameState::Battle), squad::spawn_units)
+            .add_systems(
+                OnEnter(GameState::Battle),
+                (despawn_units, squad::spawn_units),
+            )
             .add_systems(
                 Update,
                 (
@@ -29,8 +32,7 @@ impl Plugin for UnitsPlugin {
                     )
                         .run_if(in_state(GameState::Battle)),
                 ),
-            )
-            .add_systems(OnExit(GameState::Victory), despawn_units);
+            );
     }
 }
 

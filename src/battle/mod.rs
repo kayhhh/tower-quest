@@ -2,7 +2,10 @@ use bevy::prelude::*;
 
 use crate::GameState;
 
-use self::units::Team;
+use self::{
+    layout::{EnemyUnlockedSlots, FriendlyUnlockedSlots},
+    units::Team,
+};
 
 pub mod camera;
 mod defeat;
@@ -15,8 +18,13 @@ pub struct BattlePlugin;
 
 impl Plugin for BattlePlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins(units::UnitsPlugin)
-            .add_systems(Startup, (layout::init_slots, layout::load_marker_images))
+        app.init_resource::<FriendlyUnlockedSlots>()
+            .init_resource::<EnemyUnlockedSlots>()
+            .add_plugins(units::UnitsPlugin)
+            .add_systems(
+                Startup,
+                (layout::init_slots, layout::load_marker_images, start_music),
+            )
             .add_systems(
                 Update,
                 (
@@ -37,8 +45,24 @@ impl Plugin for BattlePlugin {
                 (victory::increase_floor, enemy::upgrade_enemy).chain(),
             )
             .add_systems(OnEnter(GameState::Defeat), defeat::spawn_menu)
-            .add_systems(OnExit(GameState::Defeat), defeat::cleanup_menu);
+            .add_systems(
+                OnExit(GameState::Defeat),
+                (defeat::cleanup_menu, cleanup_slots, layout::init_slots),
+            );
     }
 }
 
 pub const INITIAL_UNITS: usize = 10;
+
+fn start_music(mut commands: Commands, asset_server: Res<AssetServer>) {
+    commands.spawn(AudioBundle {
+        source: asset_server.load("sounds/groove.ogg"),
+        ..default()
+    });
+}
+
+fn cleanup_slots(mut commands: Commands, slots: Query<Entity, With<layout::SquadSlot>>) {
+    for ent in &mut slots.iter() {
+        commands.entity(ent).despawn_recursive();
+    }
+}
