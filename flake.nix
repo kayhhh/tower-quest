@@ -35,7 +35,11 @@
           xorg.libXrandr
         ]);
 
-        native_build_inputs = with pkgs; [ cargo-auditable pkg-config ];
+        native_build_inputs = with pkgs; [
+          cargo-auditable
+          pkg-config
+          wasm-bindgen-cli
+        ];
 
         code = pkgs.callPackage ./. {
           inherit pkgs system build_inputs native_build_inputs;
@@ -44,7 +48,7 @@
         packages = code // {
           all = pkgs.symlinkJoin {
             name = "all";
-            paths = with code; [ bin ];
+            paths = with code; [ bin wasm ];
           };
 
           default = packages.all;
