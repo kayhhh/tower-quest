@@ -39,6 +39,7 @@
           cargo-auditable
           pkg-config
           wasm-bindgen-cli
+          zip
         ];
 
         code = pkgs.callPackage ./. {

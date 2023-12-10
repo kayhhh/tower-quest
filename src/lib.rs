@@ -5,6 +5,7 @@ use bevy_xpbd_2d::{plugins::PhysicsPlugins, resources::Gravity};
 
 mod battle;
 mod menu;
+mod music;
 mod rewards;
 
 pub fn start() {
@@ -16,6 +17,7 @@ pub fn start() {
             RoundUiPlugin,
             battle::BattlePlugin,
             menu::MenuPlugin,
+            music::MusicPlugin,
             rewards::RewardsPlugin,
         ))
         .init_resource::<Floor>()

@@ -21,10 +21,7 @@ impl Plugin for BattlePlugin {
         app.init_resource::<FriendlyUnlockedSlots>()
             .init_resource::<EnemyUnlockedSlots>()
             .add_plugins(units::UnitsPlugin)
-            .add_systems(
-                Startup,
-                (layout::init_slots, layout::load_marker_images, start_music),
-            )
+            .add_systems(Startup, (layout::init_slots, layout::load_marker_images))
             .add_systems(
                 Update,
                 (
@@ -53,13 +50,6 @@ impl Plugin for BattlePlugin {
 }
 
 pub const INITIAL_UNITS: usize = 10;
-
-fn start_music(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.spawn(AudioBundle {
-        source: asset_server.load("sounds/groove.ogg"),
-        ..default()
-    });
-}
 
 fn cleanup_slots(mut commands: Commands, slots: Query<Entity, With<layout::SquadSlot>>) {
     for ent in &mut slots.iter() {
