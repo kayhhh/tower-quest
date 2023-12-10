@@ -9,7 +9,6 @@ use crate::{
             Team,
         },
     },
-    GameState,
 };
 
 pub struct EffectsPlugin;
