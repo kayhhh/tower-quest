@@ -1,4 +1,7 @@
-use bevy::{audio::PlaybackMode, prelude::*};
+use bevy::{
+    audio::{PlaybackMode, Volume},
+    prelude::*,
+};
 
 use crate::GameState;
 
@@ -57,6 +60,7 @@ fn play_downtime(mut commands: Commands, music: Res<MusicSources>) {
             source: music.downtime.clone(),
             settings: PlaybackSettings {
                 mode: PlaybackMode::Loop,
+                volume: Volume::new_relative(0.7),
                 ..default()
             },
         },
@@ -86,6 +90,7 @@ fn play_intro(mut commands: Commands, music: Res<MusicSources>) {
             source: music.battle_intro.clone(),
             settings: PlaybackSettings {
                 mode: PlaybackMode::Once,
+                volume: Volume::new_relative(0.7),
                 ..default()
             },
         },
@@ -109,6 +114,7 @@ fn transition_intro(
                     source: sources.battle.clone(),
                     settings: PlaybackSettings {
                         mode: PlaybackMode::Loop,
+                        volume: Volume::new_relative(0.7),
                         ..default()
                     },
                 },

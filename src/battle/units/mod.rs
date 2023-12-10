@@ -6,6 +6,7 @@ pub mod ai;
 pub mod animation;
 pub mod formation;
 pub mod presets;
+mod sounds;
 mod sprites;
 pub mod squad;
 
@@ -13,7 +14,8 @@ pub struct UnitsPlugin;
 
 impl Plugin for UnitsPlugin {
     fn build(&self, app: &mut App) {
-        app.init_resource::<sprites::UnitSprites>()
+        app.add_plugins(sounds::SoundsPlugin)
+            .init_resource::<sprites::UnitSprites>()
             .add_event::<animation::AttackEvent>()
             .add_systems(Startup, sprites::load_sprites)
             .add_systems(

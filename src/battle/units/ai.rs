@@ -3,7 +3,7 @@ use bevy_xpbd_2d::components::{Collider, LinearVelocity, RigidBody};
 
 use crate::rewards::effects::SpeedModifier;
 
-use super::{animation::AttackEvent, Team};
+use super::{animation::AttackEvent, squad::UnitType, Team};
 
 #[derive(Component, Clone, Default)]
 pub struct MovementSpeed(pub f32);
@@ -128,6 +128,7 @@ pub fn move_units(
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 pub fn attack(
     mut commands: Commands,
     time: Res<Time>,
@@ -135,6 +136,7 @@ pub fn attack(
     attackers: Query<
         (
             Entity,
+            &UnitType,
             &AttackRange,
             &AttackTarget,
             &AttackDamage,
@@ -145,10 +147,13 @@ pub fn attack(
     >,
     mut healths: Query<&mut Health>,
     transforms: Query<&GlobalTransform>,
+    mut swing_writer: EventWriter<super::sounds::SwingSound>,
+    mut hit_writer: EventWriter<super::sounds::HitSound>,
+    mut death_writer: EventWriter<super::sounds::DeathSound>,
 ) {
     let now = time.elapsed_seconds();
 
-    for (ent, range, target, damage, cooldown, last) in attackers.iter() {
+    for (ent, unit, range, target, damage, cooldown, last) in attackers.iter() {
         let translation = transforms.get(ent).unwrap().translation();
         let target_translation = transforms.get(target.0).unwrap().translation();
         let distance = translation.distance(target_translation);
@@ -189,6 +194,8 @@ pub fn attack(
         health.0 -= damage.0;
 
         if health.0 <= 0.0 {
+            death_writer.send_default();
+
             commands
                 .entity(target.0)
                 .insert((Dead, Visibility::Hidden))
@@ -196,6 +203,17 @@ pub fn attack(
                 .remove::<Movement>()
                 .remove::<RigidBody>()
                 .remove::<TextureAtlasSprite>();
+        } else {
+            hit_writer.send_default();
+        }
+
+        match unit {
+            UnitType::Knight => {
+                swing_writer.send_default();
+            }
+            UnitType::Archer => {
+                swing_writer.send_default();
+            }
         }
     }
 }
