@@ -35,6 +35,12 @@ pub enum ItemEffect {
 #[derive(Resource)]
 pub struct SpeedModifier(pub f32);
 
+impl Default for SpeedModifier {
+    fn default() -> Self {
+        Self(1.0)
+    }
+}
+
 #[derive(Event)]
 pub struct AddColumn {
     pub team: Team,

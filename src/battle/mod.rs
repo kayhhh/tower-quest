@@ -37,10 +37,7 @@ impl Plugin for BattlePlugin {
                 )
                     .run_if(in_state(GameState::Battle)),
             )
-            .add_systems(
-                OnExit(GameState::Victory),
-                (victory::increase_floor, enemy::upgrade_enemy).chain(),
-            )
+            .add_systems(OnExit(GameState::Victory), victory::increase_floor)
             .add_systems(OnEnter(GameState::Defeat), defeat::spawn_menu)
             .add_systems(
                 OnExit(GameState::Defeat),

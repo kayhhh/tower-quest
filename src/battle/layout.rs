@@ -6,6 +6,7 @@ use crate::{
 };
 
 use super::{
+    enemy::rand_unit_count,
     units::squad::{Squad, SquadBundle, SquadCount, UnitType},
     Team,
 };
@@ -52,7 +53,7 @@ pub fn init_slots(
 
         let num_units = match team {
             Team::Player => INITIAL_UNITS,
-            Team::Enemy => INITIAL_UNITS / 2,
+            Team::Enemy => rand_unit_count(0),
         };
 
         add_squad_writer.send(AddSquad {

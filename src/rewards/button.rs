@@ -121,25 +121,43 @@ pub fn handle_item_select(
                 copies.0 -= 1;
             }
 
-            match effect {
-                ItemEffect::AddMovementSpeed(multiplier) => {
-                    add_movement_writer.send(AddMovementSpeed(*multiplier));
-                }
-                ItemEffect::AddSquad(squad) => {
-                    add_squad_writer.send(AddSquad {
-                        squad: squad.clone(),
-                        team: Team::Player,
-                    });
-                }
-                ItemEffect::AddColumn => {
-                    add_column_writer.send(AddColumn { team: Team::Player });
-                }
-                ItemEffect::AddRow => {
-                    add_row_writer.send(AddRow { team: Team::Player });
-                }
-            };
+            activate_item_effect(
+                effect,
+                Team::Player,
+                &mut add_movement_writer,
+                &mut add_squad_writer,
+                &mut add_column_writer,
+                &mut add_row_writer,
+            );
 
             next_state.set(GameState::Battle);
         }
     }
+}
+
+pub fn activate_item_effect(
+    effect: &ItemEffect,
+    team: Team,
+    add_movement_writer: &mut EventWriter<AddMovementSpeed>,
+    add_squad_writer: &mut EventWriter<AddSquad>,
+    add_column_writer: &mut EventWriter<AddColumn>,
+    add_row_writer: &mut EventWriter<AddRow>,
+) {
+    match effect {
+        ItemEffect::AddMovementSpeed(multiplier) => {
+            add_movement_writer.send(AddMovementSpeed(*multiplier));
+        }
+        ItemEffect::AddSquad(squad) => {
+            add_squad_writer.send(AddSquad {
+                squad: squad.clone(),
+                team,
+            });
+        }
+        ItemEffect::AddColumn => {
+            add_column_writer.send(AddColumn { team });
+        }
+        ItemEffect::AddRow => {
+            add_row_writer.send(AddRow { team });
+        }
+    };
 }

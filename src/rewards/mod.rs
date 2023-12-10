@@ -3,13 +3,14 @@ use bevy_round_ui::{
     autosize::{RoundUiAutosizeNode, RoundUiAutosizeNodePadding},
     prelude::{RoundUiBorder, RoundUiMaterial},
 };
+use rand::Rng;
 
-use crate::{menu::colors, GameState};
+use crate::{battle::units::Team, menu::colors, GameState};
 
 use self::{
-    button::{ItemCard, ItemCardStyle, ItemSelect},
-    choices::{ItemChoice, ItemChoices, NumItemChoices},
-    effects::SpeedModifier,
+    button::{activate_item_effect, ItemCard, ItemCardStyle, ItemSelect},
+    choices::{EnemyItemChoices, FriendlyItemChoices, ItemChoice, NumItemChoices},
+    effects::{AddColumn, AddMovementSpeed, AddRow, AddSquad, ItemEffect, SpeedModifier},
 };
 
 mod button;
@@ -23,9 +24,10 @@ impl Plugin for RewardsPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(effects::EffectsPlugin)
             .init_resource::<ItemCardStyle>()
-            .init_resource::<ItemChoices>()
-            .insert_resource(SpeedModifier(1.0))
-            .insert_resource(NumItemChoices(3))
+            .init_resource::<FriendlyItemChoices>()
+            .init_resource::<EnemyItemChoices>()
+            .init_resource::<SpeedModifier>()
+            .init_resource::<NumItemChoices>()
             .add_systems(Startup, items::init_items)
             .add_systems(
                 Update,
@@ -33,10 +35,38 @@ impl Plugin for RewardsPlugin {
             )
             .add_systems(
                 OnEnter(GameState::Victory),
-                (choices::set_item_choices, setup_rewards).chain(),
+                (choices::set_item_choices, (setup_rewards, upgrade_enemy)).chain(),
             )
             .add_systems(OnExit(GameState::Victory), cleanup);
     }
+}
+
+fn upgrade_enemy(
+    choices: Res<EnemyItemChoices>,
+    effects: Query<(Entity, &ItemEffect)>,
+    mut add_movement_writer: EventWriter<AddMovementSpeed>,
+    mut add_squad_writer: EventWriter<AddSquad>,
+    mut add_column_writer: EventWriter<AddColumn>,
+    mut add_row_writer: EventWriter<AddRow>,
+) {
+    let mut rng = rand::thread_rng();
+
+    // Pick a random item from the choices
+    let item = rng.gen_range(0..choices.0.len());
+    let item = &choices.0[item];
+
+    info!("Enemy chose item: {}", item.name);
+
+    let effect = effects.get(item.entity).unwrap().1;
+
+    activate_item_effect(
+        effect,
+        Team::Enemy,
+        &mut add_movement_writer,
+        &mut add_squad_writer,
+        &mut add_column_writer,
+        &mut add_row_writer,
+    );
 }
 
 #[derive(Component)]
@@ -47,7 +77,7 @@ pub fn setup_rewards(
     button_style: Res<ItemCardStyle>,
     mut materials: ResMut<Assets<RoundUiMaterial>>,
     asset_server: Res<AssetServer>,
-    choices: Res<ItemChoices>,
+    choices: Res<FriendlyItemChoices>,
 ) {
     let font = asset_server.load("font/vt323.ttf");
 
