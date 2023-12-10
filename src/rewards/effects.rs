@@ -1,12 +1,15 @@
 use bevy::prelude::*;
 use rand::Rng;
 
-use crate::battle::{
-    layout::{slot_coords, EnemyUnlockedSlots, FriendlyUnlockedSlots, SquadSlot},
-    units::{
-        squad::{Squad, SquadBundle},
-        Team,
+use crate::{
+    battle::{
+        layout::{slot_coords, EnemyUnlockedSlots, FriendlyUnlockedSlots, SquadSlot},
+        units::{
+            squad::{Squad, SquadBundle},
+            Team,
+        },
     },
+    GameState,
 };
 
 pub struct EffectsPlugin;
@@ -19,7 +22,8 @@ impl Plugin for EffectsPlugin {
             .add_event::<AddMovementSpeed>()
             .add_systems(
                 Update,
-                (add_column, add_row, add_squad, add_movement_speed).chain(),
+                (add_column, add_row, add_squad, add_movement_speed)
+                    .run_if(in_state(GameState::PreBattle)),
             );
     }
 }
@@ -95,6 +99,8 @@ fn add_squad(
 
         let mut rng = rand::thread_rng();
         let slot = open_slots[rng.gen_range(0..count)];
+
+        info!("Adding {:?} squad to slot: {:?}", team, slot);
 
         commands.entity(slot).insert(squad.clone());
     }

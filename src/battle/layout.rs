@@ -40,7 +40,6 @@ pub struct SquadSlot;
 pub fn init_slots(
     mut add_column_writer: EventWriter<AddColumn>,
     mut add_row_writer: EventWriter<AddRow>,
-    mut add_squad_writer: EventWriter<AddSquad>,
 ) {
     for team in &[Team::Player, Team::Enemy] {
         for _ in 0..INITIAL_COLUMNS {
@@ -50,10 +49,14 @@ pub fn init_slots(
         for _ in 0..INITIAL_ROWS {
             add_row_writer.send(AddRow { team: team.clone() });
         }
+    }
+}
 
+pub fn init_units(mut add_squad_writer: EventWriter<AddSquad>) {
+    for team in &[Team::Player, Team::Enemy] {
         let num_units = match team {
             Team::Player => INITIAL_UNITS,
-            Team::Enemy => rand_unit_count(0),
+            Team::Enemy => rand_unit_count(1),
         };
 
         add_squad_writer.send(AddSquad {

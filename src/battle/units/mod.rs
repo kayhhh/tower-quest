@@ -26,13 +26,10 @@ impl Plugin for UnitsPlugin {
                 Update,
                 (
                     (ai::set_target, ai::move_units, ai::attack).chain(),
-                    (
-                        animation::animate_atlas,
-                        animation::animate_attack,
-                        animation::flip_units,
-                        sprites::spawn_sprites,
-                    )
-                        .run_if(in_state(GameState::Battle)),
+                    animation::animate_atlas,
+                    animation::animate_attack,
+                    animation::flip_units,
+                    sprites::spawn_sprites,
                 ),
             );
     }

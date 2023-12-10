@@ -31,6 +31,8 @@ pub fn start() {
 pub enum GameState {
     #[default]
     Menu,
+    InitBattle,
+    PreBattle,
     Battle,
     Victory,
     Defeat,

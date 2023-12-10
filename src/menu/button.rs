@@ -136,7 +136,7 @@ pub fn handle_actions(
         }
 
         match deferred.action {
-            ButtonAction::Start => next_state.set(GameState::Battle),
+            ButtonAction::Start => next_state.set(GameState::InitBattle),
             ButtonAction::Quit => app_exit_events.send(AppExit),
         }
 

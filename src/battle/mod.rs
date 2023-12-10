@@ -21,50 +21,72 @@ impl Plugin for BattlePlugin {
         app.init_resource::<FriendlyUnlockedSlots>()
             .init_resource::<EnemyUnlockedSlots>()
             .add_plugins(units::UnitsPlugin)
-            .add_systems(Startup, (layout::init_slots, layout::load_marker_images))
+            .add_systems(Startup, layout::load_marker_images)
+            .add_systems(
+                OnEnter(GameState::InitBattle),
+                (
+                    despawn_slots,
+                    init_unlocked_slots,
+                    layout::init_slots,
+                    layout::init_units,
+                ),
+            )
             .add_systems(
                 Update,
                 (
-                    (
-                        camera::calc_bounds,
-                        camera::set_camera_velocity,
-                        camera::apply_camera_velocity,
-                    )
-                        .chain(),
+                    finish_init_battle.run_if(in_state(GameState::InitBattle)),
+                    finish_pre_battle.run_if(in_state(GameState::PreBattle)),
                     layout::add_markers,
                     layout::spawn_marker_sprites,
-                    victory::detect_victory,
-                )
-                    .run_if(in_state(GameState::Battle)),
+                    (
+                        (
+                            camera::calc_bounds,
+                            camera::set_camera_velocity,
+                            camera::apply_camera_velocity,
+                        )
+                            .chain(),
+                        victory::detect_victory,
+                    )
+                        .run_if(in_state(GameState::Battle)),
+                ),
             )
             .add_systems(OnExit(GameState::Victory), victory::increase_floor)
             .add_systems(OnEnter(GameState::Defeat), defeat::spawn_menu)
-            .add_systems(
-                OnExit(GameState::Defeat),
-                (
-                    defeat::cleanup_menu,
-                    cleanup_slots,
-                    layout::init_slots,
-                    reset_unlocked_slots,
-                ),
-            );
+            .add_systems(OnExit(GameState::Defeat), defeat::cleanup_menu);
     }
 }
 
 pub const INITIAL_UNITS: usize = 10;
 
-fn cleanup_slots(mut commands: Commands, slots: Query<Entity, With<layout::SquadSlot>>) {
+fn finish_init_battle(mut next_state: ResMut<NextState<GameState>>, mut frames: Local<usize>) {
+    if *frames < 16 {
+        *frames += 1;
+        return;
+    }
+
+    info!("Exiting InitBattle");
+    *frames = 0;
+    next_state.set(GameState::PreBattle);
+}
+
+fn finish_pre_battle(mut next_state: ResMut<NextState<GameState>>, mut frames: Local<usize>) {
+    if *frames < 16 {
+        *frames += 1;
+        return;
+    }
+
+    info!("Exiting PreBattle");
+    *frames = 0;
+    next_state.set(GameState::Battle);
+}
+
+fn despawn_slots(mut commands: Commands, slots: Query<Entity, With<layout::SquadSlot>>) {
     for ent in &mut slots.iter() {
         commands.entity(ent).despawn_recursive();
     }
 }
 
-fn reset_unlocked_slots(
-    mut friendly_slots: ResMut<FriendlyUnlockedSlots>,
-    mut enemy_slots: ResMut<EnemyUnlockedSlots>,
-) {
-    friendly_slots.0.columns = 0;
-    friendly_slots.0.rows = 0;
-    enemy_slots.0.columns = 0;
-    enemy_slots.0.rows = 0;
+fn init_unlocked_slots(mut commands: Commands) {
+    commands.insert_resource(FriendlyUnlockedSlots::default());
+    commands.insert_resource(EnemyUnlockedSlots::default());
 }

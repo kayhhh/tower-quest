@@ -130,7 +130,7 @@ pub fn handle_item_select(
                 &mut add_row_writer,
             );
 
-            next_state.set(GameState::Battle);
+            next_state.set(GameState::PreBattle);
         }
     }
 }

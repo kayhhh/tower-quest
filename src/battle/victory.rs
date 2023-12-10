@@ -35,7 +35,7 @@ pub fn detect_victory(
     if player_alive {
         info!("Player wins!");
         next_state.set(GameState::Victory);
-    } else if !enemy_alive {
+    } else if enemy_alive {
         info!("Enemy wins!");
         next_state.set(GameState::Defeat);
     } else {
