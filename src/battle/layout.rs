@@ -11,10 +11,10 @@ use super::{
     Team,
 };
 
-pub const ARENA_WIDTH: f32 = 500.0;
-pub const ARENA_HEIGHT: f32 = 300.0;
+pub const ARENA_WIDTH: f32 = 600.0;
+pub const ARENA_HEIGHT: f32 = 400.0;
 /// Gap between the two territories
-const TEAM_GAP: f32 = 75.0;
+const TEAM_GAP: f32 = 100.0;
 
 pub const MAX_ROWS: usize = 5;
 pub const MAX_COLUMNS: usize = 3;

@@ -9,27 +9,19 @@ pub struct MusicPlugin;
 
 impl Plugin for MusicPlugin {
     fn build(&self, app: &mut App) {
-        app.add_state::<MusicState>()
-            .add_systems(Startup, load_music)
+        app.add_systems(Startup, load_music)
             .add_systems(OnEnter(GameState::Menu), play_downtime)
+            .add_systems(OnEnter(GameState::InitBattle), play_intro)
             .add_systems(
                 OnEnter(GameState::Battle),
-                (
-                    play_intro.run_if(in_state(MusicState::NeedsIntro)),
-                    unpause_battle.run_if(in_state(MusicState::PlayedIntro)),
-                    despawn_downtime,
-                )
-                    .chain(),
+                (unpause_battle, despawn_downtime),
             )
-            .add_systems(
-                Update,
-                transition_intro.run_if(in_state(MusicState::NeedsIntro)),
-            )
+            .add_systems(Update, transition_intro)
             .add_systems(
                 OnExit(GameState::Battle),
                 (pause_battle, play_downtime).chain(),
             )
-            .add_systems(OnEnter(GameState::Defeat), reset_music_state);
+            .add_systems(OnEnter(GameState::Defeat), remove_battle);
     }
 }
 
@@ -74,13 +66,6 @@ fn despawn_downtime(mut commands: Commands, sources: Query<Entity, With<MusicDow
     }
 }
 
-#[derive(Clone, Default, PartialEq, Eq, Hash, Debug, States)]
-pub enum MusicState {
-    #[default]
-    NeedsIntro,
-    PlayedIntro,
-}
-
 #[derive(Component)]
 pub struct IntroTimer(pub Timer);
 
@@ -103,12 +88,10 @@ fn transition_intro(
     sources: Res<MusicSources>,
     time: Res<Time>,
     mut intro: Query<(Entity, &mut IntroTimer)>,
-    mut next_state: ResMut<NextState<MusicState>>,
 ) {
     for (ent, mut timer) in intro.iter_mut() {
         if timer.0.tick(time.delta()).just_finished() {
             commands.entity(ent).despawn_recursive();
-
             commands.spawn((
                 AudioBundle {
                     source: sources.battle.clone(),
@@ -120,8 +103,6 @@ fn transition_intro(
                 },
                 MusicBattle,
             ));
-
-            next_state.set(MusicState::PlayedIntro);
         }
     }
 }
@@ -138,6 +119,8 @@ fn unpause_battle(sources: Query<&AudioSink, With<MusicBattle>>) {
     }
 }
 
-fn reset_music_state(mut next_state: ResMut<NextState<MusicState>>) {
-    next_state.set(MusicState::NeedsIntro);
+fn remove_battle(mut commands: Commands, sources: Query<Entity, With<MusicBattle>>) {
+    for ent in sources.iter() {
+        commands.entity(ent).despawn_recursive();
+    }
 }
