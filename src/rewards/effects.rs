@@ -20,11 +20,7 @@ impl Plugin for EffectsPlugin {
             .add_event::<AddRow>()
             .add_event::<AddSquad>()
             .add_event::<AddMovementSpeed>()
-            .add_systems(
-                Update,
-                (add_column, add_row, add_squad, add_movement_speed)
-                    .run_if(in_state(GameState::PreBattle)),
-            );
+            .add_systems(Update, (add_column, add_row, add_squad, add_movement_speed));
     }
 }
 
@@ -36,7 +32,6 @@ pub enum ItemEffect {
     AddSquad(SquadBundle),
 }
 
-#[derive(Resource)]
 pub struct SpeedModifier(pub f32);
 
 impl Default for SpeedModifier {
@@ -44,6 +39,12 @@ impl Default for SpeedModifier {
         Self(1.0)
     }
 }
+
+#[derive(Resource, Default)]
+pub struct FriendlySpeedModifier(pub SpeedModifier);
+
+#[derive(Resource, Default)]
+pub struct EnemySpeedModifier(pub SpeedModifier);
 
 #[derive(Event)]
 pub struct AddColumn {
@@ -62,14 +63,25 @@ pub struct AddSquad {
 }
 
 #[derive(Event)]
-pub struct AddMovementSpeed(pub f32);
+pub struct AddMovementSpeed {
+    pub speed: f32,
+    pub team: Team,
+}
 
 fn add_movement_speed(
-    mut speed_modifier: ResMut<SpeedModifier>,
     mut events: EventReader<AddMovementSpeed>,
+    enemy_modifier: ResMut<EnemySpeedModifier>,
+    friendly_modifier: ResMut<FriendlySpeedModifier>,
 ) {
-    for AddMovementSpeed(speed) in events.read() {
-        speed_modifier.0 += speed;
+    for AddMovementSpeed { speed, team } in events.read() {
+        info!("Adding movement speed to {:?}", team);
+
+        let mut modifier = match team {
+            Team::Player => friendly_modifier.0 .0,
+            Team::Enemy => enemy_modifier.0 .0,
+        };
+
+        modifier += speed;
     }
 }
 
@@ -84,6 +96,8 @@ fn add_squad(
     }
 
     for AddSquad { squad, team } in events.read() {
+        info!("Adding {:?} squad", team);
+
         let open_slots = open_slots
             .iter()
             .filter(|(_, t)| **t == *team)
@@ -100,8 +114,6 @@ fn add_squad(
         let mut rng = rand::thread_rng();
         let slot = open_slots[rng.gen_range(0..count)];
 
-        info!("Adding {:?} squad to slot: {:?}", team, slot);
-
         commands.entity(slot).insert(squad.clone());
     }
 }
@@ -113,6 +125,8 @@ fn add_column(
     mut enemy_slots: ResMut<EnemyUnlockedSlots>,
 ) {
     for event in events.read() {
+        info!("Adding column to {:?}", event.team);
+
         let slots = match event.team {
             Team::Player => &mut friendly_slots.0,
             Team::Enemy => &mut enemy_slots.0,
@@ -148,6 +162,8 @@ fn add_row(
     mut enemy_slots: ResMut<EnemyUnlockedSlots>,
 ) {
     for event in events.read() {
+        info!("Adding row to {:?}", event.team);
+
         let slots = match event.team {
             Team::Player => &mut friendly_slots.0,
             Team::Enemy => &mut enemy_slots.0,

@@ -10,7 +10,10 @@ use crate::{battle::units::Team, menu::colors, GameState};
 use self::{
     button::{activate_item_effect, ItemCard, ItemCardStyle, ItemSelect},
     choices::{EnemyItemChoices, FriendlyItemChoices, ItemChoice, NumItemChoices},
-    effects::{AddColumn, AddMovementSpeed, AddRow, AddSquad, ItemEffect, SpeedModifier},
+    effects::{
+        AddColumn, AddMovementSpeed, AddRow, AddSquad, EnemySpeedModifier, FriendlySpeedModifier,
+        ItemEffect,
+    },
 };
 
 mod button;
@@ -23,12 +26,14 @@ pub struct RewardsPlugin;
 impl Plugin for RewardsPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(effects::EffectsPlugin)
-            .init_resource::<ItemCardStyle>()
-            .init_resource::<FriendlyItemChoices>()
             .init_resource::<EnemyItemChoices>()
-            .init_resource::<SpeedModifier>()
+            .init_resource::<EnemySpeedModifier>()
+            .init_resource::<FriendlyItemChoices>()
+            .init_resource::<FriendlySpeedModifier>()
+            .init_resource::<ItemCardStyle>()
             .init_resource::<NumItemChoices>()
             .add_systems(Startup, items::init_items)
+            .add_systems(OnEnter(GameState::InitBattle), init_resources)
             .add_systems(
                 Update,
                 (button::handle_interactions, button::handle_item_select),
@@ -39,6 +44,14 @@ impl Plugin for RewardsPlugin {
             )
             .add_systems(OnExit(GameState::Victory), cleanup);
     }
+}
+
+fn init_resources(mut commands: Commands) {
+    commands.insert_resource(EnemyItemChoices::default());
+    commands.insert_resource(EnemySpeedModifier::default());
+    commands.insert_resource(FriendlyItemChoices::default());
+    commands.insert_resource(FriendlySpeedModifier::default());
+    commands.insert_resource(NumItemChoices::default());
 }
 
 fn upgrade_enemy(

@@ -58,25 +58,13 @@ impl Plugin for BattlePlugin {
 
 pub const INITIAL_UNITS: usize = 10;
 
-fn finish_init_battle(mut next_state: ResMut<NextState<GameState>>, mut frames: Local<usize>) {
-    if *frames < 16 {
-        *frames += 1;
-        return;
-    }
-
+fn finish_init_battle(mut next_state: ResMut<NextState<GameState>>) {
     info!("Exiting InitBattle");
-    *frames = 0;
     next_state.set(GameState::PreBattle);
 }
 
-fn finish_pre_battle(mut next_state: ResMut<NextState<GameState>>, mut frames: Local<usize>) {
-    if *frames < 16 {
-        *frames += 1;
-        return;
-    }
-
+fn finish_pre_battle(mut next_state: ResMut<NextState<GameState>>) {
     info!("Exiting PreBattle");
-    *frames = 0;
     next_state.set(GameState::Battle);
 }
 

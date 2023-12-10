@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_xpbd_2d::components::{Collider, LinearVelocity, RigidBody};
 
-use crate::rewards::effects::SpeedModifier;
+use crate::rewards::effects::{EnemySpeedModifier, FriendlySpeedModifier};
 
 use super::{animation::AttackEvent, squad::UnitType, Team};
 
@@ -90,18 +90,20 @@ pub fn set_target(
 }
 
 pub fn move_units(
-    speed_modifier: Res<SpeedModifier>,
+    friendly_speed_modifier: Res<FriendlySpeedModifier>,
+    enemy_speed_modifier: Res<EnemySpeedModifier>,
     mut units: Query<
         (
             &mut GlobalTransform,
             &mut LinearVelocity,
+            &Team,
             &Movement,
             &MovementSpeed,
         ),
         Without<Dead>,
     >,
 ) {
-    for (transform, mut velocity, movement, speed) in units.iter_mut() {
+    for (transform, mut velocity, team, movement, speed) in units.iter_mut() {
         let direction = match movement {
             Movement::Direct { target } => {
                 let direction = *target - transform.translation();
@@ -118,6 +120,11 @@ pub fn move_units(
                 let direction = *target - translation;
                 direction.normalize()
             }
+        };
+
+        let speed_modifier = match team {
+            Team::Player => &friendly_speed_modifier.0,
+            Team::Enemy => &enemy_speed_modifier.0,
         };
 
         let speed = speed.0 * speed_modifier.0;

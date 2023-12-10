@@ -144,8 +144,11 @@ pub fn activate_item_effect(
     add_row_writer: &mut EventWriter<AddRow>,
 ) {
     match effect {
-        ItemEffect::AddMovementSpeed(multiplier) => {
-            add_movement_writer.send(AddMovementSpeed(*multiplier));
+        ItemEffect::AddMovementSpeed(speed) => {
+            add_movement_writer.send(AddMovementSpeed {
+                speed: *speed,
+                team,
+            });
         }
         ItemEffect::AddSquad(squad) => {
             add_squad_writer.send(AddSquad {
