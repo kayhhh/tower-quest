@@ -1,6 +1,9 @@
 use bevy::prelude::*;
 
-use crate::battle::units::squad::{SquadBundle, SquadCount, UnitType};
+use crate::battle::{
+    layout::{INITIAL_COLUMNS, MAX_COLUMNS},
+    units::squad::{SquadBundle, SquadCount, UnitType},
+};
 
 use super::effects::ItemEffect;
 
@@ -104,5 +107,27 @@ pub fn init_items(mut commands: Commands, asset_server: Res<AssetServer>) {
         level: ItemLevel::default(),
         rarity: ItemRarity::Common,
         requirements: ItemRequirements(vec![ItemRequirement::OpenSlot]),
+    });
+
+    commands.spawn(ItemBundle {
+        copies: ItemMaxCopies(MAX_COLUMNS - INITIAL_COLUMNS),
+        description: ItemDescription("+1 column".to_string()),
+        effect: ItemEffect::AddColumn,
+        image: asset_server.load("images/items/AddColumn.png"),
+        name: Name::new("Column"),
+        level: ItemLevel::default(),
+        rarity: ItemRarity::Epic,
+        requirements: ItemRequirements::default(),
+    });
+
+    commands.spawn(ItemBundle {
+        copies: ItemMaxCopies(1),
+        description: ItemDescription("+1 row".to_string()),
+        effect: ItemEffect::AddRow,
+        image: asset_server.load("images/items/AddRow.png"),
+        name: Name::new("Row"),
+        level: ItemLevel::default(),
+        rarity: ItemRarity::Rare,
+        requirements: ItemRequirements::default(),
     });
 }

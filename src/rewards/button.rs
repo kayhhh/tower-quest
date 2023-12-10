@@ -1,12 +1,8 @@
 use bevy::prelude::*;
 use bevy_round_ui::prelude::{RoundUiBorder, RoundUiMaterial, RoundUiOffset};
-use rand::Rng;
 
 use crate::{
-    battle::{
-        layout::SquadSlot,
-        units::{squad::Squad, Team},
-    },
+    battle::units::Team,
     menu::{
         colors,
         sounds::{HoverSound, SelectSound},
@@ -15,7 +11,7 @@ use crate::{
 };
 
 use super::{
-    effects::{ItemEffect, SpeedModifier},
+    effects::{AddColumn, AddMovementSpeed, AddRow, AddSquad, ItemEffect},
     items::{ItemLevel, ItemMaxCopies},
 };
 
@@ -99,12 +95,13 @@ pub fn handle_interactions(
 pub struct ItemSelect(pub Entity);
 
 pub fn handle_item_select(
-    mut commands: Commands,
     interaction_query: Query<(&Interaction, &ItemSelect), Changed<Interaction>>,
     mut next_state: ResMut<NextState<GameState>>,
     mut items: Query<(&Name, &mut ItemMaxCopies, &mut ItemLevel, &ItemEffect)>,
-    mut speed_modified: ResMut<SpeedModifier>,
-    open_slots: Query<(Entity, &Team), (With<SquadSlot>, Without<Squad>)>,
+    mut add_movement_writer: EventWriter<AddMovementSpeed>,
+    mut add_squad_writer: EventWriter<AddSquad>,
+    mut add_column_writer: EventWriter<AddColumn>,
+    mut add_row_writer: EventWriter<AddRow>,
 ) {
     for (interaction, action) in &interaction_query {
         if *interaction == Interaction::Pressed {
@@ -126,26 +123,19 @@ pub fn handle_item_select(
 
             match effect {
                 ItemEffect::AddMovementSpeed(multiplier) => {
-                    speed_modified.0 += multiplier;
+                    add_movement_writer.send(AddMovementSpeed(*multiplier));
                 }
                 ItemEffect::AddSquad(squad) => {
-                    let open_slots = open_slots
-                        .iter()
-                        .filter(|(_, team)| **team == Team::Player)
-                        .map(|(ent, _)| ent)
-                        .collect::<Vec<_>>();
-
-                    let count = open_slots.len();
-
-                    if count == 0 {
-                        error!("No open slots");
-                        continue;
-                    }
-
-                    let mut rng = rand::thread_rng();
-                    let slot = open_slots[rng.gen_range(0..count)];
-
-                    commands.entity(slot).insert(squad.clone());
+                    add_squad_writer.send(AddSquad {
+                        squad: squad.clone(),
+                        team: Team::Player,
+                    });
+                }
+                ItemEffect::AddColumn => {
+                    add_column_writer.send(AddColumn { team: Team::Player });
+                }
+                ItemEffect::AddRow => {
+                    add_row_writer.send(AddRow { team: Team::Player });
                 }
             };
 

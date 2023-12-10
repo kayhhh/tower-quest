@@ -17,14 +17,12 @@ impl Plugin for SoundsPlugin {
 #[derive(Resource)]
 pub struct Sounds {
     pub swing: Handle<AudioSource>,
-    pub hit: Handle<AudioSource>,
     pub death: Handle<AudioSource>,
 }
 
 fn load_sounds(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.insert_resource(Sounds {
         swing: asset_server.load("sounds/swing.ogg"),
-        hit: asset_server.load("sounds/hit.ogg"),
         death: asset_server.load("sounds/death.ogg"),
     });
 }

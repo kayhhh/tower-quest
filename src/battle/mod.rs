@@ -44,7 +44,12 @@ impl Plugin for BattlePlugin {
             .add_systems(OnEnter(GameState::Defeat), defeat::spawn_menu)
             .add_systems(
                 OnExit(GameState::Defeat),
-                (defeat::cleanup_menu, cleanup_slots, layout::init_slots),
+                (
+                    defeat::cleanup_menu,
+                    cleanup_slots,
+                    layout::init_slots,
+                    reset_unlocked_slots,
+                ),
             );
     }
 }
@@ -55,4 +60,14 @@ fn cleanup_slots(mut commands: Commands, slots: Query<Entity, With<layout::Squad
     for ent in &mut slots.iter() {
         commands.entity(ent).despawn_recursive();
     }
+}
+
+fn reset_unlocked_slots(
+    mut friendly_slots: ResMut<FriendlyUnlockedSlots>,
+    mut enemy_slots: ResMut<EnemyUnlockedSlots>,
+) {
+    friendly_slots.0.columns = 0;
+    friendly_slots.0.rows = 0;
+    enemy_slots.0.columns = 0;
+    enemy_slots.0.rows = 0;
 }

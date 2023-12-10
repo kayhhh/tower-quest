@@ -21,7 +21,8 @@ pub struct RewardsPlugin;
 
 impl Plugin for RewardsPlugin {
     fn build(&self, app: &mut App) {
-        app.init_resource::<ItemCardStyle>()
+        app.add_plugins(effects::EffectsPlugin)
+            .init_resource::<ItemCardStyle>()
             .init_resource::<ItemChoices>()
             .insert_resource(SpeedModifier(1.0))
             .insert_resource(NumItemChoices(3))

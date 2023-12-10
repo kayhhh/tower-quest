@@ -33,7 +33,6 @@ pub enum GameState {
     Menu,
     Battle,
     Victory,
-    Reward,
     Defeat,
 }
 
