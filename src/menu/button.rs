@@ -63,11 +63,19 @@ pub fn handle_interactions(
         (Changed<Interaction>, With<RoundButton>),
     >,
     button_style: Res<ButtonStyle>,
+    mut hover_writer: EventWriter<super::sounds::HoverSound>,
+    mut select_writer: EventWriter<super::sounds::SelectSound>,
 ) {
     for (interaction, mut material) in &mut interaction_query {
         *material = match *interaction {
-            Interaction::Pressed => button_style.press.clone(),
-            Interaction::Hovered => button_style.hover.clone(),
+            Interaction::Pressed => {
+                select_writer.send_default();
+                button_style.press.clone()
+            }
+            Interaction::Hovered => {
+                hover_writer.send_default();
+                button_style.hover.clone()
+            }
             Interaction::None => button_style.default.clone(),
         };
     }

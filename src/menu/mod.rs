@@ -10,12 +10,16 @@ use self::button::{ButtonAction, ButtonStyle, RoundButton};
 
 pub mod button;
 pub mod colors;
+pub mod sounds;
 
 pub struct MenuPlugin;
 
 impl Plugin for MenuPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<button::ButtonStyle>()
+            .add_event::<sounds::HoverSound>()
+            .add_event::<sounds::SelectSound>()
+            .add_systems(Startup, sounds::load_sounds)
             .add_systems(OnEnter(GameState::Menu), setup)
             .add_systems(OnExit(GameState::Menu), cleanup)
             .add_systems(
@@ -24,6 +28,8 @@ impl Plugin for MenuPlugin {
                     button::defer_actions,
                     button::handle_actions,
                     button::handle_interactions,
+                    sounds::play_hover_sounds,
+                    sounds::play_select_sounds,
                 ),
             );
     }

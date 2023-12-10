@@ -8,13 +8,9 @@ pub struct SoundsPlugin;
 impl Plugin for SoundsPlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<SwingSound>()
-            .add_event::<HitSound>()
             .add_event::<DeathSound>()
             .add_systems(Startup, load_sounds)
-            .add_systems(
-                Update,
-                (play_swing_sounds, play_hit_sounds, play_death_sounds),
-            );
+            .add_systems(Update, (play_swing_sounds, play_death_sounds));
     }
 }
 
@@ -37,9 +33,6 @@ fn load_sounds(mut commands: Commands, asset_server: Res<AssetServer>) {
 pub struct SwingSound;
 
 #[derive(Event, Default)]
-pub struct HitSound;
-
-#[derive(Event, Default)]
 pub struct DeathSound;
 
 fn play_swing_sounds(
@@ -50,19 +43,6 @@ fn play_swing_sounds(
     for _ in swing.read() {
         commands.spawn(AudioBundle {
             source: sounds.swing.clone(),
-            settings: PlaybackSettings {
-                volume: bevy::audio::Volume::Relative(VolumeLevel::new(0.4)),
-                mode: PlaybackMode::Despawn,
-                ..default()
-            },
-        });
-    }
-}
-
-fn play_hit_sounds(mut commands: Commands, sounds: Res<Sounds>, mut hit: EventReader<HitSound>) {
-    for _ in hit.read() {
-        commands.spawn(AudioBundle {
-            source: sounds.hit.clone(),
             settings: PlaybackSettings {
                 volume: bevy::audio::Volume::Relative(VolumeLevel::new(0.5)),
                 mode: PlaybackMode::Despawn,

@@ -148,7 +148,6 @@ pub fn attack(
     mut healths: Query<&mut Health>,
     transforms: Query<&GlobalTransform>,
     mut swing_writer: EventWriter<super::sounds::SwingSound>,
-    mut hit_writer: EventWriter<super::sounds::HitSound>,
     mut death_writer: EventWriter<super::sounds::DeathSound>,
 ) {
     let now = time.elapsed_seconds();
@@ -203,8 +202,6 @@ pub fn attack(
                 .remove::<Movement>()
                 .remove::<RigidBody>()
                 .remove::<TextureAtlasSprite>();
-        } else {
-            hit_writer.send_default();
         }
 
         match unit {

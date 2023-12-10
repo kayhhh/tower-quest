@@ -7,7 +7,10 @@ use crate::{
         layout::SquadSlot,
         units::{squad::Squad, Team},
     },
-    menu::colors,
+    menu::{
+        colors,
+        sounds::{HoverSound, SelectSound},
+    },
     GameState,
 };
 
@@ -74,11 +77,19 @@ pub fn handle_interactions(
         (Changed<Interaction>, With<ItemCard>),
     >,
     button_style: Res<ItemCardStyle>,
+    mut hover_sound: EventWriter<HoverSound>,
+    mut select_sound: EventWriter<SelectSound>,
 ) {
     for (interaction, mut material) in &mut interaction_query {
         *material = match *interaction {
-            Interaction::Pressed => button_style.press.clone(),
-            Interaction::Hovered => button_style.hover.clone(),
+            Interaction::Pressed => {
+                select_sound.send_default();
+                button_style.press.clone()
+            }
+            Interaction::Hovered => {
+                hover_sound.send_default();
+                button_style.hover.clone()
+            }
             Interaction::None => button_style.default.clone(),
         };
     }
