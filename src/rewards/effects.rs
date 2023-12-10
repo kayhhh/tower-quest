@@ -1,13 +1,11 @@
 use bevy::prelude::*;
 use rand::Rng;
 
-use crate::{
-    battle::{
-        layout::{slot_coords, EnemyUnlockedSlots, FriendlyUnlockedSlots, SquadSlot},
-        units::{
-            squad::{Squad, SquadBundle},
-            Team,
-        },
+use crate::battle::{
+    layout::{slot_coords, EnemyUnlockedSlots, FriendlyUnlockedSlots, SquadSlot},
+    units::{
+        squad::{Squad, SquadBundle},
+        Team,
     },
 };
 
