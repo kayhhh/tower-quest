@@ -4,6 +4,7 @@ use rand::Rng;
 use crate::battle::{
     layout::{slot_coords, EnemyUnlockedSlots, FriendlyUnlockedSlots, SquadSlot},
     units::{
+        formation::rand_formation,
         squad::{Squad, SquadBundle, UnitType},
         Team,
     },
@@ -141,7 +142,10 @@ fn add_squad(
         let mut rng = rand::thread_rng();
         let slot = open_slots[rng.gen_range(0..count)];
 
-        commands.entity(slot).insert(squad.clone());
+        commands
+            .entity(slot)
+            .insert(squad.clone())
+            .insert(rand_formation());
     }
 }
 
