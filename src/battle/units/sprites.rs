@@ -15,8 +15,8 @@ pub struct UnitSprites {
 
 pub fn load_sprites(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.insert_resource(UnitSprites {
-        archer_enemy: asset_server.load("images/units/ArcherEnemy.png"),
-        archer_friendly: asset_server.load("images/units/ArcherFriendly.png"),
+        archer_enemy: asset_server.load("images/units/KnightEnemy.png"),
+        archer_friendly: asset_server.load("images/units/KnightFriendly.png"),
         knight_enemy: asset_server.load("images/units/KnightEnemy.png"),
         knight_friendly: asset_server.load("images/units/KnightFriendly.png"),
     });
