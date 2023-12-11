@@ -1,5 +1,5 @@
 use battle::camera::CameraVelocity;
-use bevy::{core_pipeline::clear_color::ClearColorConfig, prelude::*};
+use bevy::{asset::AssetMetaCheck, core_pipeline::clear_color::ClearColorConfig, prelude::*};
 use bevy_round_ui::prelude::RoundUiPlugin;
 use bevy_xpbd_2d::{plugins::PhysicsPlugins, resources::Gravity};
 
@@ -10,6 +10,7 @@ mod rewards;
 
 pub fn start() {
     App::new()
+        .insert_resource(AssetMetaCheck::Never)
         .add_plugins((
             DefaultPlugins.set(ImagePlugin::default_nearest()),
             PhysicsPlugins::default(),
