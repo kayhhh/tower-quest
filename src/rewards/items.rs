@@ -4,7 +4,6 @@ use crate::battle::{
     layout::{INITIAL_COLUMNS, MAX_COLUMNS},
     units::{
         squad::{SquadBundle, SquadCount, UnitType},
-        Team,
     },
     INITIAL_UNITS,
 };
