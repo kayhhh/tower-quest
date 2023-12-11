@@ -96,7 +96,7 @@ pub fn init_items(mut commands: Commands, asset_server: Res<AssetServer>) {
     });
 
     commands.spawn(ItemBundle {
-        copies: ItemMaxCopies(16),
+        copies: ItemMaxCopies(15),
         description: ItemDescription("+1 knight squad".to_string()),
         effect: ItemEffect::AddSquad(SquadBundle {
             unit: UnitType::Knight,
@@ -119,7 +119,7 @@ pub fn init_items(mut commands: Commands, asset_server: Res<AssetServer>) {
         },
         image: asset_server.load("images/items/BallOfKnights.png"),
         name: Name::new("Ball of Knights"),
-        level: ItemLevel::new(5),
+        level: ItemLevel::new(10),
         rarity: ItemRarity::Epic,
         requirements: ItemRequirements(vec![ItemRequirement::OpenSlot]),
     });
