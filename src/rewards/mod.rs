@@ -5,7 +5,11 @@ use bevy_round_ui::{
 };
 use rand::Rng;
 
-use crate::{battle::units::Team, menu::colors, GameState};
+use crate::{
+    battle::{enemy::rand_unit_count, units::Team},
+    menu::colors,
+    Floor, GameState,
+};
 
 use self::{
     button::{activate_item_effect, ItemCard, ItemCardStyle, ItemSelect},
@@ -59,9 +63,11 @@ fn init_resources(mut commands: Commands) {
     commands.insert_resource(NumItemChoices::default());
 }
 
+#[allow(clippy::too_many_arguments)]
 fn upgrade_enemy(
     choices: Res<EnemyItemChoices>,
     effects: Query<(Entity, &ItemEffect)>,
+    floor: Res<Floor>,
     mut add_movement_writer: EventWriter<AddMovementSpeed>,
     mut add_squad_writer: EventWriter<AddSquad>,
     mut add_column_writer: EventWriter<AddColumn>,
@@ -78,8 +84,22 @@ fn upgrade_enemy(
 
     let effect = effects.get(item.entity).unwrap().1;
 
+    let effect = match effect {
+        ItemEffect::AddMovementSpeed(speed) => ItemEffect::AddMovementSpeed(speed / 2.0),
+        ItemEffect::SquadSizeMultiplier { multiplier, unit } => ItemEffect::SquadSizeMultiplier {
+            multiplier: ((multiplier - 1.0) / 2.0) + 1.0,
+            unit: unit.clone(),
+        },
+        ItemEffect::AddSquad(squad) => {
+            let mut squad = squad.clone();
+            squad.count.0 = rand_unit_count(floor.0);
+            ItemEffect::AddSquad(squad)
+        }
+        _ => effect.clone(),
+    };
+
     activate_item_effect(
-        effect,
+        &effect,
         Team::Enemy,
         &mut add_movement_writer,
         &mut add_squad_writer,

@@ -9,7 +9,7 @@ use self::{
 
 pub mod camera;
 mod defeat;
-mod enemy;
+pub mod enemy;
 pub mod layout;
 pub mod units;
 mod victory;

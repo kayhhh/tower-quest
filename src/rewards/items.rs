@@ -6,6 +6,7 @@ use crate::battle::{
         squad::{SquadBundle, SquadCount, UnitType},
         Team,
     },
+    INITIAL_UNITS,
 };
 
 use super::effects::ItemEffect;
@@ -91,18 +92,18 @@ pub fn init_items(mut commands: Commands, asset_server: Res<AssetServer>) {
         description: ItemDescription("+25% movement speed".to_string()),
         effect: ItemEffect::AddMovementSpeed(0.25),
         image: asset_server.load("images/items/Coffee.png"),
-        level: ItemLevel::new(3),
+        level: ItemLevel::new(4),
         name: Name::new("Coffee"),
         rarity: ItemRarity::Rare,
         requirements: ItemRequirements::default(),
     });
 
     commands.spawn(ItemBundle {
-        copies: ItemMaxCopies(10),
+        copies: ItemMaxCopies(16),
         description: ItemDescription("+1 knight squad".to_string()),
         effect: ItemEffect::AddSquad(SquadBundle {
             unit: UnitType::Knight,
-            count: SquadCount(10),
+            count: SquadCount(INITIAL_UNITS),
             ..default()
         }),
         image: asset_server.load("images/items/KnightItem.png"),
@@ -121,7 +122,7 @@ pub fn init_items(mut commands: Commands, asset_server: Res<AssetServer>) {
         },
         image: asset_server.load("images/items/BallOfKnights.png"),
         name: Name::new("Ball of Knights"),
-        level: ItemLevel::new(4),
+        level: ItemLevel::new(5),
         rarity: ItemRarity::Epic,
         requirements: ItemRequirements(vec![ItemRequirement::OpenSlot]),
     });
@@ -144,7 +145,7 @@ pub fn init_items(mut commands: Commands, asset_server: Res<AssetServer>) {
         image: asset_server.load("images/items/AddRow.png"),
         name: Name::new("Row"),
         level: ItemLevel::default(),
-        rarity: ItemRarity::Rare,
+        rarity: ItemRarity::Epic,
         requirements: ItemRequirements::default(),
     });
 }

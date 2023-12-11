@@ -31,7 +31,7 @@ impl Plugin for EffectsPlugin {
     }
 }
 
-#[derive(Component)]
+#[derive(Component, Clone)]
 pub enum ItemEffect {
     AddColumn,
     AddMovementSpeed(f32),
@@ -107,7 +107,7 @@ fn add_movement_speed(
 
         match team {
             Team::Player => friendly_modifier.0 .0 += speed,
-            Team::Enemy => enemy_modifier.0 .0 += speed / 2.0,
+            Team::Enemy => enemy_modifier.0 .0 += speed,
         };
     }
 }
@@ -237,17 +237,10 @@ fn apply_squad_size_modifier(
                 UnitType::Knight => friendly_modifier.0 .0 *= multiplier,
                 _ => {}
             },
-            Team::Enemy => {
-                let multiplier = match *multiplier > 1.0 {
-                    true => ((multiplier - 1.0) / 2.0) + 1.0,
-                    false => *multiplier,
-                };
-
-                match unit {
-                    UnitType::Knight => enemy_modifier.0 .0 *= multiplier,
-                    _ => {}
-                }
-            }
+            Team::Enemy => match unit {
+                UnitType::Knight => enemy_modifier.0 .0 *= multiplier,
+                _ => {}
+            },
         };
     }
 }
