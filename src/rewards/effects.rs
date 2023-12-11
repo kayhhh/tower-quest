@@ -4,7 +4,7 @@ use rand::Rng;
 use crate::battle::{
     layout::{slot_coords, EnemyUnlockedSlots, FriendlyUnlockedSlots, SquadSlot},
     units::{
-        squad::{Squad, SquadBundle},
+        squad::{Squad, SquadBundle, UnitType},
         Team,
     },
 };
@@ -17,7 +17,17 @@ impl Plugin for EffectsPlugin {
             .add_event::<AddRow>()
             .add_event::<AddSquad>()
             .add_event::<AddMovementSpeed>()
-            .add_systems(Update, (add_column, add_row, add_squad, add_movement_speed));
+            .add_event::<SquadSizeMultiplier>()
+            .add_systems(
+                Update,
+                (
+                    add_column,
+                    add_row,
+                    add_squad,
+                    add_movement_speed,
+                    apply_squad_size_modifier,
+                ),
+            );
     }
 }
 
@@ -27,6 +37,7 @@ pub enum ItemEffect {
     AddMovementSpeed(f32),
     AddRow,
     AddSquad(SquadBundle),
+    SquadSizeMultiplier { multiplier: f32, unit: UnitType },
 }
 
 pub struct SpeedModifier(pub f32);
@@ -65,20 +76,39 @@ pub struct AddMovementSpeed {
     pub team: Team,
 }
 
+#[derive(Event)]
+pub struct SquadSizeMultiplier {
+    pub multiplier: f32,
+    pub unit: UnitType,
+    pub team: Team,
+}
+
+pub struct SquadSizeModifier(pub f32);
+
+impl Default for SquadSizeModifier {
+    fn default() -> Self {
+        Self(1.0)
+    }
+}
+
+#[derive(Resource, Default)]
+pub struct FriendlyKnightSquadSizeModifier(pub SquadSizeModifier);
+
+#[derive(Resource, Default)]
+pub struct EnemyKnightSquadSizeModifier(pub SquadSizeModifier);
+
 fn add_movement_speed(
     mut events: EventReader<AddMovementSpeed>,
-    enemy_modifier: ResMut<EnemySpeedModifier>,
-    friendly_modifier: ResMut<FriendlySpeedModifier>,
+    mut enemy_modifier: ResMut<EnemySpeedModifier>,
+    mut friendly_modifier: ResMut<FriendlySpeedModifier>,
 ) {
     for AddMovementSpeed { speed, team } in events.read() {
         info!("Adding movement speed to {:?}", team);
 
-        let mut modifier = match team {
-            Team::Player => friendly_modifier.0 .0,
-            Team::Enemy => enemy_modifier.0 .0,
+        match team {
+            Team::Player => friendly_modifier.0 .0 += speed,
+            Team::Enemy => enemy_modifier.0 .0 += speed / 2.0,
         };
-
-        modifier += speed;
     }
 }
 
@@ -186,5 +216,38 @@ fn add_row(
                 VisibilityBundle::default(),
             ));
         }
+    }
+}
+
+fn apply_squad_size_modifier(
+    mut events: EventReader<SquadSizeMultiplier>,
+    mut friendly_modifier: ResMut<FriendlyKnightSquadSizeModifier>,
+    mut enemy_modifier: ResMut<EnemyKnightSquadSizeModifier>,
+) {
+    for SquadSizeMultiplier {
+        multiplier,
+        unit,
+        team,
+    } in events.read()
+    {
+        info!("Applying squad size modifier to {:?}", team);
+
+        match team {
+            Team::Player => match unit {
+                UnitType::Knight => friendly_modifier.0 .0 *= multiplier,
+                _ => {}
+            },
+            Team::Enemy => {
+                let multiplier = match *multiplier > 1.0 {
+                    true => ((multiplier - 1.0) / 2.0) + 1.0,
+                    false => *multiplier,
+                };
+
+                match unit {
+                    UnitType::Knight => enemy_modifier.0 .0 *= multiplier,
+                    _ => {}
+                }
+            }
+        };
     }
 }

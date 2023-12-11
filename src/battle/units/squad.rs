@@ -1,6 +1,8 @@
 use bevy::prelude::*;
 use rand::Rng;
 
+use crate::rewards::effects::FriendlyKnightSquadSizeModifier;
+
 use super::{formation::Formation, presets::UnitBundle, Team};
 
 #[derive(Component)]
@@ -46,11 +48,19 @@ pub struct SquadBundle {
 pub fn spawn_units(
     mut commands: Commands,
     mut squads: Query<(Entity, &Formation, &Team, &SquadCount, &UnitType), With<Squad>>,
+    friendly_squad_size_modifier: Res<FriendlyKnightSquadSizeModifier>,
+    enemy_squad_size_modifier: Res<FriendlyKnightSquadSizeModifier>,
 ) {
     let mut rng = rand::thread_rng();
 
     for (ent, formation, team, count, unit) in squads.iter_mut() {
-        let coords = formation.coords(count.0);
+        let modifier = match team {
+            Team::Player => &friendly_squad_size_modifier.0,
+            Team::Enemy => &enemy_squad_size_modifier.0,
+        };
+
+        let count = (count.0 as f32 * modifier.0) as usize;
+        let coords = formation.coords(count);
 
         for (mut x, mut y) in coords {
             x *= unit.spacing().x;

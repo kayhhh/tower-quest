@@ -2,7 +2,10 @@ use bevy::prelude::*;
 
 use crate::battle::{
     layout::{INITIAL_COLUMNS, MAX_COLUMNS},
-    units::squad::{SquadBundle, SquadCount, UnitType},
+    units::{
+        squad::{SquadBundle, SquadCount, UnitType},
+        Team,
+    },
 };
 
 use super::effects::ItemEffect;
@@ -95,7 +98,7 @@ pub fn init_items(mut commands: Commands, asset_server: Res<AssetServer>) {
     });
 
     commands.spawn(ItemBundle {
-        copies: ItemMaxCopies(6),
+        copies: ItemMaxCopies(10),
         description: ItemDescription("+1 knight squad".to_string()),
         effect: ItemEffect::AddSquad(SquadBundle {
             unit: UnitType::Knight,
@@ -106,6 +109,20 @@ pub fn init_items(mut commands: Commands, asset_server: Res<AssetServer>) {
         name: Name::new("Knight Squad"),
         level: ItemLevel::default(),
         rarity: ItemRarity::Common,
+        requirements: ItemRequirements(vec![ItemRequirement::OpenSlot]),
+    });
+
+    commands.spawn(ItemBundle {
+        copies: ItemMaxCopies(1),
+        description: ItemDescription("+50% knight squad size".to_string()),
+        effect: ItemEffect::SquadSizeMultiplier {
+            multiplier: 1.5,
+            unit: UnitType::Knight,
+        },
+        image: asset_server.load("images/items/BallOfKnights.png"),
+        name: Name::new("Ball of Knights"),
+        level: ItemLevel::new(4),
+        rarity: ItemRarity::Epic,
         requirements: ItemRequirements(vec![ItemRequirement::OpenSlot]),
     });
 

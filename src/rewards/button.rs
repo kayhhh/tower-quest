@@ -11,7 +11,7 @@ use crate::{
 };
 
 use super::{
-    effects::{AddColumn, AddMovementSpeed, AddRow, AddSquad, ItemEffect},
+    effects::{AddColumn, AddMovementSpeed, AddRow, AddSquad, ItemEffect, SquadSizeMultiplier},
     items::{ItemLevel, ItemMaxCopies},
 };
 
@@ -102,6 +102,7 @@ pub fn handle_item_select(
     mut add_squad_writer: EventWriter<AddSquad>,
     mut add_column_writer: EventWriter<AddColumn>,
     mut add_row_writer: EventWriter<AddRow>,
+    mut squad_size_multiplier_writer: EventWriter<SquadSizeMultiplier>,
 ) {
     for (interaction, action) in &interaction_query {
         if *interaction == Interaction::Pressed {
@@ -128,6 +129,7 @@ pub fn handle_item_select(
                 &mut add_squad_writer,
                 &mut add_column_writer,
                 &mut add_row_writer,
+                &mut squad_size_multiplier_writer,
             );
 
             next_state.set(GameState::PreBattle);
@@ -142,6 +144,7 @@ pub fn activate_item_effect(
     add_squad_writer: &mut EventWriter<AddSquad>,
     add_column_writer: &mut EventWriter<AddColumn>,
     add_row_writer: &mut EventWriter<AddRow>,
+    squad_size_multiplier_writer: &mut EventWriter<SquadSizeMultiplier>,
 ) {
     match effect {
         ItemEffect::AddMovementSpeed(speed) => {
@@ -153,6 +156,13 @@ pub fn activate_item_effect(
         ItemEffect::AddSquad(squad) => {
             add_squad_writer.send(AddSquad {
                 squad: squad.clone(),
+                team,
+            });
+        }
+        ItemEffect::SquadSizeMultiplier { multiplier, unit } => {
+            squad_size_multiplier_writer.send(SquadSizeMultiplier {
+                multiplier: *multiplier,
+                unit: unit.clone(),
                 team,
             });
         }

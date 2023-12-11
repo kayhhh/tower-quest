@@ -11,8 +11,9 @@ use self::{
     button::{activate_item_effect, ItemCard, ItemCardStyle, ItemSelect},
     choices::{EnemyItemChoices, FriendlyItemChoices, ItemChoice, NumItemChoices},
     effects::{
-        AddColumn, AddMovementSpeed, AddRow, AddSquad, EnemySpeedModifier, FriendlySpeedModifier,
-        ItemEffect,
+        AddColumn, AddMovementSpeed, AddRow, AddSquad, EnemyKnightSquadSizeModifier,
+        EnemySpeedModifier, FriendlyKnightSquadSizeModifier, FriendlySpeedModifier, ItemEffect,
+        SquadSizeMultiplier,
     },
 };
 
@@ -30,6 +31,8 @@ impl Plugin for RewardsPlugin {
             .init_resource::<EnemySpeedModifier>()
             .init_resource::<FriendlyItemChoices>()
             .init_resource::<FriendlySpeedModifier>()
+            .init_resource::<FriendlyKnightSquadSizeModifier>()
+            .init_resource::<EnemyKnightSquadSizeModifier>()
             .init_resource::<ItemCardStyle>()
             .init_resource::<NumItemChoices>()
             .add_systems(Startup, items::init_items)
@@ -51,6 +54,8 @@ fn init_resources(mut commands: Commands) {
     commands.insert_resource(EnemySpeedModifier::default());
     commands.insert_resource(FriendlyItemChoices::default());
     commands.insert_resource(FriendlySpeedModifier::default());
+    commands.insert_resource(FriendlyKnightSquadSizeModifier::default());
+    commands.insert_resource(EnemyKnightSquadSizeModifier::default());
     commands.insert_resource(NumItemChoices::default());
 }
 
@@ -61,6 +66,7 @@ fn upgrade_enemy(
     mut add_squad_writer: EventWriter<AddSquad>,
     mut add_column_writer: EventWriter<AddColumn>,
     mut add_row_writer: EventWriter<AddRow>,
+    mut squad_size_multiplier_writer: EventWriter<SquadSizeMultiplier>,
 ) {
     let mut rng = rand::thread_rng();
 
@@ -79,6 +85,7 @@ fn upgrade_enemy(
         &mut add_squad_writer,
         &mut add_column_writer,
         &mut add_row_writer,
+        &mut squad_size_multiplier_writer,
     );
 }
 
