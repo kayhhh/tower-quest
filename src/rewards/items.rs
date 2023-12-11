@@ -2,9 +2,7 @@ use bevy::prelude::*;
 
 use crate::battle::{
     layout::{INITIAL_COLUMNS, MAX_COLUMNS},
-    units::{
-        squad::{SquadBundle, SquadCount, UnitType},
-    },
+    units::squad::{SquadBundle, SquadCount, UnitType},
     INITIAL_UNITS,
 };
 
