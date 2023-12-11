@@ -6,3 +6,6 @@ This is my first game jam, and really my first time making a full game.
 Hope you like it!
 
 ![image](assets/images/cover.png)
+![image](assets/images/ss1.png)
+![image](assets/images/ss2.png)
+![image](assets/images/ss3.png)
