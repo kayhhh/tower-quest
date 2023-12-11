@@ -70,11 +70,7 @@ fn coords_box(count: usize) -> Vec<(f32, f32)> {
 }
 
 pub fn rand_formation() -> Formation {
+    let formations = [Formation::Pyramid, Formation::Box];
     let mut rng = rand::thread_rng();
-
-    match rng.gen_range(0..2) {
-        0 => Formation::Pyramid,
-        1 => Formation::Box,
-        _ => unreachable!(),
-    }
+    formations[rng.gen_range(0..formations.len())].clone()
 }

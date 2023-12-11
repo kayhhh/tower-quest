@@ -92,10 +92,14 @@ pub fn set_item_choices(
         choices.clear();
 
         // Randomly select items from the weighted list
-        choices.extend(
-            (0..num_choices.0)
-                .map(|_| rng.gen_range(0..weighted_items.len()))
-                .map(|i| weighted_items[i].clone()),
-        );
+        // Ensure unique items
+        while choices.len() < num_choices.0 && !weighted_items.is_empty() {
+            let index = rng.gen_range(0..weighted_items.len());
+            let choice = weighted_items.remove(index);
+
+            if !choices.iter().any(|c| c.name == choice.name) {
+                choices.push(choice);
+            }
+        }
     }
 }
